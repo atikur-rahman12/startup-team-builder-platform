@@ -1,9 +1,16 @@
+import Hero from "@/components/Hero";
+import Statistics from "@/components/Statistics";
+import WhyJoin from "@/components/WhyJoin";
 import Image from "next/image";
 
 export default function Home() {
   return (
     <div>
-      <h1>Hiiiiiiiiiiiiiiiiiiiiiiiiiii....</h1>
+      <Hero />
+
+
+      <Statistics />
+      <WhyJoin />
     </div>
   );
 }
