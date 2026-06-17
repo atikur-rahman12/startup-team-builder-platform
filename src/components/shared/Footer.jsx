@@ -1,13 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import {
-  Zap,
-  Twitter,
-  Mail,
-  ArrowRight,
-  Globe,
-  Heart,
-} from "lucide-react";
+import { Zap, Mail, ArrowRight, Heart } from "lucide-react";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
@@ -16,8 +9,8 @@ const Footer = () => {
 
   return (
     <footer className="relative border-t border-white/10 bg-slate-950 text-slate-400">
-      {/* Decorative Top Gradient Line */}
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
+      {/* Decorative Top linear Line */}
+      <div className="absolute top-0 left-0 right-0 h-1px bg-linear-to-r from-transparent via-indigo-500/50 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="grid grid-cols-1 gap-8 xl:grid-cols-3 xl:gap-8">
@@ -27,10 +20,10 @@ const Footer = () => {
               href="/"
               className="flex items-center gap-2.5 transition-transform active:scale-95"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-violet-500 to-indigo-500 text-white shadow-lg shadow-indigo-500/30">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-tr from-violet-500 to-indigo-500 text-white shadow-lg shadow-indigo-500/30">
                 <Zap size={22} className="fill-current" />
               </div>
-              <span className="bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-xl font-bold tracking-tight text-transparent">
+              <span className="bg-linear-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-xl font-bold tracking-tight text-transparent">
                 Startup<span className="text-indigo-400">Forge</span>
               </span>
             </Link>
@@ -180,7 +173,7 @@ const Footer = () => {
                 <div className="mt-3 sm:mt-0">
                   <button
                     type="submit"
-                    className="btn btn-sm h-10 w-full sm:w-auto rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-medium hover:from-violet-500 hover:to-indigo-500 border-none shadow-md shadow-indigo-500/20 active:scale-95 transition-all px-4"
+                    className="btn btn-sm h-10 w-full sm:w-auto rounded-xl bg-linear-to-r from-violet-600 to-indigo-600 text-white font-medium hover:from-violet-500 hover:to-indigo-500 border-none shadow-md shadow-indigo-500/20 active:scale-95 transition-all px-4"
                   >
                     Subscribe
                   </button>
