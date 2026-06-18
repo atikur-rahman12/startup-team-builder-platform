@@ -26,8 +26,7 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Navbar />
-        <main className="flex grow flex-col">{children}</main>
+        {children}
         <Toaster
           position="top-center" // প্রফেশনাল অ্যাপে সাধারণত টপ-রাইট বেশি স্ট্যান্ডার্ড দেখায়
           reverseOrder={false}
@@ -74,8 +73,6 @@ export default function RootLayout({ children }) {
             },
           }}
         />
-        
-        <Footer />
       </body>
     </html>
   );

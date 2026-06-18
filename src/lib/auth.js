@@ -18,8 +18,8 @@ export const auth = betterAuth({
     additionalFields: {
       role: {
         type: "string",
-        required: false, // আপনি চাইলে true করে দিতে পারেন
-        defaultValue: "founder",
+        required: false,
+        defaultValue: "collaborator",
       },
       // plan: {
       //   type: "string",

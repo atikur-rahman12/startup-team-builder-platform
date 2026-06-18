@@ -29,7 +29,7 @@ const SignUp = () => {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("founder");
+  const [role, setRole] = useState("collaborator");
   const [password, setPassword] = useState("");
 
   const [imageFile, setImageFile] = useState(null);
@@ -230,15 +230,15 @@ const SignUp = () => {
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
-                  onClick={() => setRole("founder")}
+                  onClick={() => setRole("collaborator")}
                   className={`h-10 rounded-xl border flex items-center justify-center text-center transition-all duration-300 cursor-pointer relative overflow-hidden text-sm font-bold tracking-wide ${
-                    role === "founder"
+                    role === "collaborator"
                       ? "bg-violet-600/10 border-violet-500/80 text-white shadow-lg shadow-violet-950/30"
                       : "bg-slate-950/40 border-white/5 text-slate-400 hover:border-white/10 hover:text-slate-200"
                   }`}
                 >
-                  Founder
-                  {role === "founder" && (
+                  Collaborator
+                  {role === "collaborator" && (
                     <div className="absolute top-1 right-1 bg-violet-500 text-white p-0.5 rounded-full">
                       <Check size={8} strokeWidth={4} />
                     </div>
@@ -247,15 +247,15 @@ const SignUp = () => {
 
                 <button
                   type="button"
-                  onClick={() => setRole("collaborator")}
+                  onClick={() => setRole("founder")}
                   className={`h-10 rounded-xl border flex items-center justify-center text-center transition-all duration-300 cursor-pointer relative overflow-hidden text-sm font-bold tracking-wide ${
-                    role === "collaborator"
+                    role === "founder"
                       ? "bg-cyan-600/10 border-cyan-500/80 text-white shadow-lg shadow-cyan-950/30"
                       : "bg-slate-950/40 border-white/5 text-slate-400 hover:border-white/10 hover:text-slate-200"
                   }`}
                 >
-                  Collaborator
-                  {role === "collaborator" && (
+                  Founder
+                  {role === "founder" && (
                     <div className="absolute top-1 right-1 bg-cyan-500 text-white p-0.5 rounded-full">
                       <Check size={8} strokeWidth={4} />
                     </div>
