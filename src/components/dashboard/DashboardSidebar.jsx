@@ -35,22 +35,22 @@ const DashboardSidebar = ({ children }) => {
     },
     {
       name: "My Startup",
-      href: "/dashboard/my-startup",
+      href: "/dashboard/founder/startup",
       icon: <Rocket size={18} />,
     },
     {
       name: "Add Opportunity",
-      href: "/dashboard/add-opportunity",
+      href: "/dashboard/founder/add-opportunity",
       icon: <PlusCircle size={18} />,
     },
     {
       name: "Manage Opportunities",
-      href: "/dashboard/manage-opportunities",
+      href: "/dashboard/founder/manage-opportunities",
       icon: <FolderKanban size={18} />,
     },
     {
       name: "Applications",
-      href: "/dashboard/applications",
+      href: "/dashboard/founder/applications",
       icon: <FileText size={18} />,
     },
   ];
@@ -98,7 +98,6 @@ const DashboardSidebar = ({ children }) => {
 
   const role = session?.user?.role;
 
-  // এখানে কন্ডিশন ম্যাচ না করলে null এর পরিবর্তে ডিফেন্সিভ মেকানিজম হিসেবে খালি অ্যারে [] দেওয়া হয়েছে
   const navContents =
     role === "founder"
       ? founderMenu
@@ -129,7 +128,6 @@ const DashboardSidebar = ({ children }) => {
       <div className="drawer-content flex flex-col min-h-screen relative overflow-hidden">
         {/* Top Navbar Section */}
         <nav className="navbar w-full bg-[#09090b]/40 backdrop-blur-xl border-b border-zinc-800/40 px-6 sticky top-0 z-40 justify-between transition-all duration-300">
-          {/* Left Side: Mobile Menu Button & Platform Info */}
           <div className="flex items-center gap-4">
             <label
               htmlFor="my-drawer-4"
@@ -149,7 +147,6 @@ const DashboardSidebar = ({ children }) => {
               </svg>
             </label>
 
-            {/* Hidden on Mobile, Shows Workspace title on Large Screens */}
             <div className="hidden lg:flex flex-col">
               <span className="text-xs font-medium text-zinc-500 tracking-wider uppercase">
                 Workspace
@@ -162,9 +159,7 @@ const DashboardSidebar = ({ children }) => {
             </div>
           </div>
 
-          {/* Right Side: Quick Actions & Status */}
           <div className="flex items-center gap-4">
-            {/* Quick Homepage Link */}
             <Link
               href="/"
               className="p-2 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 border border-transparent hover:border-zinc-800/40 rounded-xl transition-all duration-200"
@@ -173,7 +168,6 @@ const DashboardSidebar = ({ children }) => {
               <Home size={18} />
             </Link>
 
-            {/* Notification Bell Badge */}
             <button
               className="p-2 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 border border-transparent hover:border-zinc-800/40 rounded-xl transition-all duration-200 relative cursor-pointer"
               title="Notifications"
@@ -182,7 +176,6 @@ const DashboardSidebar = ({ children }) => {
               <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-indigo-500 ring-4 ring-[#09090b]"></span>
             </button>
 
-            {/* Dynamic Panel Status Badge */}
             <div className="flex items-center gap-2 text-zinc-400 text-xs font-semibold tracking-widest uppercase bg-zinc-900/60 border border-zinc-800/50 px-3 py-1.5 rounded-full shadow-inner">
               <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               {currentUser?.role
@@ -232,12 +225,11 @@ const DashboardSidebar = ({ children }) => {
             </div>
 
             <ul className="menu p-0 w-full space-y-1 relative z-10">
-              {/* এখানে অপশনাল চেইনিং ব্যবহার করা হয়েছে */}
-              {navContents?.map((item) => {
+              {navContents?.map((item, index) => {
                 const isActive =
-                  pathname === item.href ||
-                  (item.href !== "/dashboard" &&
-                    pathname.startsWith(item.href));
+                  index === 0
+                    ? pathname === item.href
+                    : pathname.startsWith(item.href);
 
                 return (
                   <li key={item.name}>
