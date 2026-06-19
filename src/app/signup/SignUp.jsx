@@ -24,6 +24,7 @@ const SignUp = () => {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/";
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
@@ -31,6 +32,7 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("collaborator");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
@@ -40,6 +42,9 @@ const SignUp = () => {
   const hasUppercase = /[A-Z]/.test(password);
   const hasLowercase = /[a-z]/.test(password);
   const isPasswordValid = hasMinLength && hasUppercase && hasLowercase;
+
+  const isPasswordMatching =
+    password === confirmPassword && confirmPassword.length > 0;
 
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
@@ -67,7 +72,6 @@ const SignUp = () => {
       const data = await response.json();
       if (data.success) {
         setImageUrl(data.data.url);
-
         toast.success("Profile picture uploaded successfully!");
       } else {
         toast.error("Image upload failed. Please check your API Key.");
@@ -76,7 +80,6 @@ const SignUp = () => {
       }
     } catch (error) {
       console.error("Error uploading image:", error);
-
       toast.error("Something went wrong during image upload.");
       setImageUrl("");
       setImageFile(null);
@@ -110,6 +113,11 @@ const SignUp = () => {
       return;
     }
 
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
     if (isUploading) {
       toast.error("Please wait until image upload completes");
       return;
@@ -132,9 +140,7 @@ const SignUp = () => {
       }
 
       await signOut();
-
       toast.success("Registration successful 🎉");
-
       router.push(`/signin?redirect=${encodeURIComponent(redirectTo)}`);
     } catch (err) {
       toast.error(err.message || "Something went wrong");
@@ -161,7 +167,8 @@ const SignUp = () => {
 
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff01_1px,transparent_1px),linear-gradient(to_bottom,#ffffff01_1px,transparent_1px)] bg-size-[32px_32px] mask-[radial-gradient(ellipse_at_center,black,transparent_75%)]" />
 
-      <div className="w-full max-w-md relative z-10 group my-8">
+      {/* এখানে max-w-md পরিবর্তন করে max-w-lg করা হয়েছে উইডথ বাড়ানোর জন্য */}
+      <div className="w-full max-w-lg relative z-10 group my-8">
         <div className="absolute -inset-0.5 bg-linear-to-r from-violet-500 to-cyan-500 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition duration-1000 group-hover:duration-200 pointer-events-none" />
 
         <div className="relative bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-3xl p-8 sm:p-10 shadow-2xl flex flex-col">
@@ -173,7 +180,7 @@ const SignUp = () => {
               </span>
             </div>
             <h2 className="text-3xl font-extrabold text-white tracking-tight">
-              Create Account on{" "}
+              Sign Up to{" "}
               <span className="bg-linear-to-r from-violet-400 via-indigo-400 to-cyan-400 bg-clip-text text-transparent">
                 StartupForge
               </span>
@@ -181,6 +188,51 @@ const SignUp = () => {
             <p className="text-sm text-slate-400 mt-1.5">
               Join our elite network of founders and tech innovators.
             </p>
+          </div>
+
+          <div className="mb-5">
+            <button
+              type="button"
+              className="w-full h-12 flex items-center justify-center gap-3 bg-white/3 hover:bg-white/6 border border-white/5 hover:border-white/10 text-slate-200 font-medium rounded-xl transition-all duration-300 transform active:scale-[0.98] cursor-pointer shadow-lg relative group/btn overflow-hidden"
+            >
+              <div className="absolute -inset-x-full h-full bg-linear-to-r from-transparent via-white/5 to-transparent transition-all duration-1000 group-hover/btn:translate-x-full" />
+
+              <svg
+                className="h-5 w-5 shrink-0"
+                viewBox="0 0 24 24"
+                width="100%"
+                height="100%"
+              >
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 12-4.53z"
+                />
+              </svg>
+
+              <span className="text-sm tracking-wide font-semibold text-slate-200">
+                Sign Up with Google
+              </span>
+            </button>
+
+            <div className="flex items-center my-6">
+              <div className="grow h-px bg-linear-to-r from-transparent to-white/10" />
+              <span className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-widest">
+                or
+              </span>
+              <div className="grow h-px bg-linear-to-l from-transparent to-white/10" />
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -384,10 +436,63 @@ const SignUp = () => {
               </div>
             </div>
 
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-400 tracking-wide uppercase px-1">
+                Confirm Password{" "}
+                <span className="text-rose-500 font-bold">*</span>
+              </label>
+              <div className="relative group/input">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 group-focus-within/input:text-violet-400 transition-colors duration-200">
+                  <Lock size={18} />
+                </div>
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full h-11 pl-11 pr-11 bg-slate-950/40 border border-white/5 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/30 transition-all duration-200 text-sm font-medium tracking-wide"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={18} />
+                  ) : (
+                    <Eye size={18} />
+                  )}
+                </button>
+              </div>
+
+              {confirmPassword.length > 0 && (
+                <div className="flex items-center gap-1.5 text-xs font-medium px-1 mt-1.5">
+                  {isPasswordMatching ? (
+                    <>
+                      <Check size={14} className="text-emerald-400" />
+                      <span className="text-slate-300">Passwords match</span>
+                    </>
+                  ) : (
+                    <>
+                      <X size={14} className="text-rose-400" />
+                      <span className="text-rose-400/80">
+                        Passwords do not match
+                      </span>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+
             <button
               type="submit"
               disabled={
-                isLoading || isUploading || isGoogleLoading || !isPasswordValid
+                isLoading ||
+                isUploading ||
+                isGoogleLoading ||
+                !isPasswordValid ||
+                !isPasswordMatching
               }
               className="w-full h-11 bg-linear-to-r from-violet-600 via-indigo-600 to-cyan-600 hover:from-violet-500 hover:via-indigo-500 hover:to-cyan-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-950/50 transition-all duration-300 transform active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer pt-0.5 relative overflow-hidden group/submit disabled:opacity-40 disabled:pointer-events-none"
             >
@@ -400,52 +505,6 @@ const SignUp = () => {
                     size={16}
                     className="transition-transform duration-200 group-hover/submit:translate-x-0.5"
                   />
-                </>
-              )}
-            </button>
-
-            <div className="relative flex items-center justify-center my-2">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/5"></div>
-              </div>
-              <span className="relative px-3 bg-slate-900 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
-                Or
-              </span>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleGoogleSignUp}
-              disabled={isLoading || isUploading || isGoogleLoading}
-              className="w-full h-11 bg-slate-950/60 hover:bg-slate-950/90 border border-white/10 text-slate-200 hover:text-white text-sm font-semibold rounded-xl transition-all duration-200 active:scale-[0.99] flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-40 disabled:pointer-events-none shadow-sm"
-            >
-              {isGoogleLoading ? (
-                <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <svg
-                    className="h-4 w-4 shrink-0"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                      fill="#4285F4"
-                    />
-                    <path
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      fill="#34A853"
-                    />
-                    <path
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                      fill="#FBBC05"
-                    />
-                    <path
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                      fill="#EA4335"
-                    />
-                  </svg>
-                  <span className="tracking-wide">Sign up with Google</span>
                 </>
               )}
             </button>

@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Rocket,
-  Sliders,
   PlusCircle,
   FolderKanban,
   FileText,
@@ -14,6 +13,9 @@ import {
   LogOut,
   Bell,
   Home,
+  UserCircle,
+  Users,
+  CreditCard,
 } from "lucide-react";
 import { signOut, useSession } from "@/lib/auth-client";
 import Image from "next/image";
@@ -25,7 +27,7 @@ const DashboardSidebar = ({ children }) => {
 
   const currentUser = session?.user;
 
-  const navContent = [
+  const founderMenu = [
     {
       name: "Dashboard Overview",
       href: "/dashboard/founder",
@@ -35,11 +37,6 @@ const DashboardSidebar = ({ children }) => {
       name: "My Startup",
       href: "/dashboard/my-startup",
       icon: <Rocket size={18} />,
-    },
-    {
-      name: "Manage Startup",
-      href: "/dashboard/manage-startup",
-      icon: <Sliders size={18} />,
     },
     {
       name: "Add Opportunity",
@@ -57,6 +54,59 @@ const DashboardSidebar = ({ children }) => {
       icon: <FileText size={18} />,
     },
   ];
+
+  const collaboratorMenu = [
+    {
+      name: "Overview",
+      icon: <LayoutDashboard size={18} />,
+      href: "/dashboard/collaborator",
+    },
+    {
+      name: "My Applications",
+      icon: <FileText size={18} />,
+      href: "/dashboard/applications",
+    },
+    {
+      name: "Profile",
+      icon: <UserCircle size={18} />,
+      href: "/dashboard/profile",
+    },
+  ];
+
+  const adminMenu = [
+    {
+      name: "Overview",
+      icon: <LayoutDashboard size={18} />,
+      href: "/dashboard/admin",
+    },
+    {
+      name: "Manage Users",
+      icon: <Users size={18} />,
+      href: "/dashboard/users",
+    },
+    {
+      name: "Manage Startups",
+      icon: <Rocket size={18} />,
+      href: "/dashboard/startups",
+    },
+    {
+      name: "Transactions",
+      icon: <CreditCard size={18} />,
+      href: "/dashboard/transactions",
+    },
+  ];
+
+  const role = session?.user?.role;
+
+  // এখানে কন্ডিশন ম্যাচ না করলে null এর পরিবর্তে ডিফেন্সিভ মেকানিজম হিসেবে খালি অ্যারে [] দেওয়া হয়েছে
+  const navContents =
+    role === "founder"
+      ? founderMenu
+      : role === "collaborator"
+        ? collaboratorMenu
+        : role === "admin"
+          ? adminMenu
+          : [];
 
   const handleLogout = async () => {
     try {
@@ -105,7 +155,9 @@ const DashboardSidebar = ({ children }) => {
                 Workspace
               </span>
               <span className="text-sm font-semibold text-zinc-200">
-                Founder Dashboard
+                {role
+                  ? `${role.charAt(0).toUpperCase() + role.slice(1)} Dashboard`
+                  : "Dashboard"}
               </span>
             </div>
           </div>
@@ -135,7 +187,7 @@ const DashboardSidebar = ({ children }) => {
               <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               {currentUser?.role
                 ? `${currentUser.role} Panel`
-                : "Founder Panel"}
+                : "Loading Panel..."}
             </div>
           </div>
         </nav>
@@ -143,7 +195,7 @@ const DashboardSidebar = ({ children }) => {
         {/* Core Layout Main View Render */}
         <div className="p-4 sm:p-6 lg:p-8 grow relative bg-[radial-linear(ellipse_at_top,var(--tw-linear-stops))] from-zinc-900/40 via-[#09090b] to-[#09090b]">
           <div className="absolute top-[-10%] right-[-5%] w-100 h-100 bg-indigo-600/5 blur-[120px] rounded-full pointer-events-none" />
-          <div className="absolute bottom-[5%] left-[-5%] w-75 h-75 bg-violet-600/5 blur-[100px] rounded-full poimask-[radial-linear(ellipse_at_center,black_80%,transparent_100%)] pointer-events-none" />
+          <div className="absolute bottom-[5%] left-[-5%] w-75 h-75 bg-violet-600/5 blur-[100px] rounded-full pointer-events-none" />
 
           <div className="relative z-10 w-full h-full">{children}</div>
         </div>
@@ -180,7 +232,8 @@ const DashboardSidebar = ({ children }) => {
             </div>
 
             <ul className="menu p-0 w-full space-y-1 relative z-10">
-              {navContent.map((item) => {
+              {/* এখানে অপশনাল চেইনিং ব্যবহার করা হয়েছে */}
+              {navContents?.map((item) => {
                 const isActive =
                   pathname === item.href ||
                   (item.href !== "/dashboard" &&
