@@ -19,11 +19,15 @@ import {
   Sparkles,
   Save,
   XCircle,
+  AlertTriangle,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { addStartups, getStartupByEmail } from "@/lib/api/startups/action";
-// API route theke update function-ti import korun (Step 2 theke)
-import { updateStartup } from "@/lib/api/startups/action";
+import {
+  addStartups,
+  getStartupByEmail,
+  updateStartup,
+  deleteStartup,
+} from "@/lib/api/startups/action";
 import { useSession } from "@/lib/auth-client";
 import Image from "next/image";
 
@@ -33,7 +37,8 @@ const StartupPage = () => {
   const [pageLoading, setPageLoading] = useState(true);
   const [isLaunching, setIsLaunching] = useState(false);
   const [existingStartup, setExistingStartup] = useState(null);
-  const [isEditing, setIsEditing] = useState(false); // Edit state manage korar jonno
+  const [isEditing, setIsEditing] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // মোডাল স্টেট
 
   const [formData, setFormData] = useState({
     startupName: "",
@@ -85,11 +90,49 @@ const StartupPage = () => {
     }
   };
 
+  // ✨ Handle Delete Core Logic (মোডালের ভেতরের ডিলিট বাটনের জন্য)
+  const handleConfirmDelete = async () => {
+    if (!session?.user?.email) {
+      toast.error("User session missing!");
+      return;
+    }
+
+    setLoading(true);
+    setIsDeleteModalOpen(false); // মোডাল ক্লোজ করে দেওয়া হলো
+
+    try {
+      const data = await deleteStartup(session.user.email);
+
+      if (data && !data.error) {
+        toast.success("Startup successfully removed from ecosystem! 🗑️");
+
+        // Dynamically shift visual state back to create mode structure
+        setExistingStartup(null);
+        setIsEditing(false);
+        setFormData({
+          startupName: "",
+          logo: "",
+          industry: "",
+          description: "",
+          fundingStage: "",
+          founderEmail: session?.user?.email || "",
+        });
+      } else {
+        toast.error(data?.message || "Could not execute data purge sequence.");
+      }
+    } catch (error) {
+      console.error("Error executing network deletion:", error);
+      toast.error("Internal network request crashed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogoUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    setLoading(true);
+    loading(true);
     const imgbbApiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
     const apiFormData = new FormData();
     apiFormData.append("image", file);
@@ -249,7 +292,6 @@ const StartupPage = () => {
         </div>
       </div>
 
-      {/* Conditional Rendering: If existing startup and NOT editing, show info view */}
       {existingStartup && !isEditing ? (
         /* PREMIUM STARTUP INFO VIEW */
         <div className="relative overflow-hidden bg-linear-to-b from-zinc-900/50 to-zinc-950/80 backdrop-blur-xl border border-zinc-800/60 rounded-3xl p-6 md:p-10 shadow-2xl shadow-black/80 space-y-8 group transition-all duration-300 hover:border-zinc-700/60">
@@ -289,7 +331,6 @@ const StartupPage = () => {
               </div>
             </div>
 
-            {/* Edit Button Handler Trigger */}
             <div className="flex items-center gap-3 w-full lg:w-auto border-t lg:border-t-0 pt-4 lg:pt-0 border-zinc-800/60">
               <button
                 type="button"
@@ -299,12 +340,16 @@ const StartupPage = () => {
                 <Edit2 size={14} className="text-zinc-400" />
                 Edit
               </button>
+
+              {/* Trigger custom delete modal instead of window.confirm */}
               <button
                 type="button"
-                className="flex-1 lg:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-500/5 border border-rose-500/20 hover:bg-rose-500/10 hover:border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold tracking-wide uppercase transition-all duration-200 shadow-sm hover:scale-[1.02] cursor-pointer"
+                disabled={loading}
+                onClick={() => setIsDeleteModalOpen(true)}
+                className="flex-1 lg:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-500/5 border border-rose-500/20 hover:bg-rose-500/10 hover:border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold tracking-wide uppercase transition-all duration-200 shadow-sm hover:scale-[1.02] cursor-pointer disabled:opacity-50"
               >
                 <Trash2 size={14} />
-                Delete
+                {loading ? "Wiping Data..." : "Delete"}
               </button>
             </div>
           </div>
@@ -371,7 +416,6 @@ const StartupPage = () => {
       ) : (
         /* CREATE / EDIT FORM VIEW */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Feature Side Card */}
           <div className="lg:col-span-1 bg-linear-to-br from-indigo-600/10 via-transparent to-transparent border border-zinc-800/40 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden group">
             <div className="absolute top-[-20%] left-[-20%] w-40 h-40 bg-indigo-500/10 blur-[50px] rounded-full" />
             <div className="space-y-4 relative z-10">
@@ -408,10 +452,8 @@ const StartupPage = () => {
             </div>
           </div>
 
-          {/* Form Content */}
           <div className="lg:col-span-2 bg-[#0d0d0e]/60 backdrop-blur-md border border-zinc-800/40 rounded-2xl p-6 md:p-8 shadow-xl shadow-black/40">
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Logo Upload Dropzone */}
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">
                   Company Logo
@@ -453,9 +495,7 @@ const StartupPage = () => {
                 </div>
               </div>
 
-              {/* Input fields */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                {/* Startup Name */}
                 <div className="form-control w-full space-y-2">
                   <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
                     Startup Name
@@ -482,7 +522,6 @@ const StartupPage = () => {
                   </div>
                 </div>
 
-                {/* Industry */}
                 <div className="form-control w-full space-y-2">
                   <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
                     Industry / Sector
@@ -506,7 +545,6 @@ const StartupPage = () => {
                   </div>
                 </div>
 
-                {/* Funding Stage */}
                 <div className="form-control w-full space-y-2">
                   <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
                     Funding Stage
@@ -569,7 +607,6 @@ const StartupPage = () => {
                   </div>
                 </div>
 
-                {/* Founder Email - Locked with cursor-not-allowed */}
                 <div className="form-control w-full space-y-2">
                   <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
                     Founder Email (Immutable)
@@ -589,7 +626,6 @@ const StartupPage = () => {
                 </div>
               </div>
 
-              {/* Description */}
               <div className="form-control w-full space-y-2">
                 <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
                   Startup Description
@@ -613,7 +649,6 @@ const StartupPage = () => {
                 </div>
               </div>
 
-              {/* Dynamic Submit / Save Button */}
               <button
                 type="submit"
                 disabled={loading}
@@ -638,6 +673,48 @@ const StartupPage = () => {
                 )}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ⚠️ CUSTOM CONFIRMATION MODAL */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
+          <div className="w-full max-w-sm bg-zinc-950 border border-zinc-800/80 rounded-2xl p-6 shadow-2xl space-y-6 relative overflow-hidden animate-scaleIn">
+            {/* Background Glow */}
+            <div className="absolute -top-10 -right-10 w-24 h-24 bg-rose-500/10 blur-xl rounded-full pointer-events-none" />
+
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 shrink-0">
+                <AlertTriangle size={22} className="animate-pulse" />
+              </div>
+              <div className="space-y-1.5">
+                <h3 className="text-base font-bold text-zinc-200 tracking-tight">
+                  Purge Venture Core?
+                </h3>
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  Are you absolutely sure you want to delete this venture? This
+                  action is permanent and cannot be undone.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="flex-1 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-zinc-200 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-colors shadow-lg shadow-rose-600/20 cursor-pointer"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

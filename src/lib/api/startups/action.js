@@ -61,3 +61,20 @@ export const updateStartup = async (email, formData) => {
     return { error: true, message: "Network error occurred" };
   }
 };
+
+export const deleteStartup = async (email) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/startup/${email}`,
+      {
+        method: "DELETE",
+      },
+    );
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error on delete action wrapper:", error);
+    return { error: true, message: "Failed to request data node deletion." };
+  }
+};
