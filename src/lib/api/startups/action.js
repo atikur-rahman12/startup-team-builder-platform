@@ -104,34 +104,34 @@ export const getOpportunitiesByEmail = async (email) => {
   }
 };
 
-// 🆕 Update Opportunity
-export const updateOpportunity = async (id, formData) => {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/opportunity/${id}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      },
-    );
-    return await response.json();
-  } catch (error) {
-    console.error("Error updating opportunity:", error);
-    return { success: false, message: "Network error occurred" };
-  }
-};
+// // 🆕 Update Opportunity
+// export const updateOpportunity = async (id, formData) => {
+//   try {
+//     const response = await fetch(
+//       `${process.env.NEXT_PUBLIC_API_URL}/api/opportunity/${id}`,
+//       {
+//         method: "PUT",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(formData),
+//       },
+//     );
+//     return await response.json();
+//   } catch (error) {
+//     console.error("Error updating opportunity:", error);
+//     return { success: false, message: "Network error occurred" };
+//   }
+// };
 
-// 🆕 Delete Opportunity
-export const deleteOpportunity = async (id) => {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/opportunity/${id}`,
-      { method: "DELETE" },
-    );
-    return await response.json();
-  } catch (error) {
-    console.error("Error deleting opportunity:", error);
-    return { success: false, message: "Failed to delete opportunity" };
-  }
-};
+// // 🆕 Delete Opportunity
+// export const deleteOpportunity = async (id) => {
+//   try {
+//     const response = await fetch(
+//       `${process.env.NEXT_PUBLIC_API_URL}/api/opportunity/${id}`,
+//       { method: "DELETE" },
+//     );
+//     return await response.json();
+//   } catch (error) {
+//     console.error("Error deleting opportunity:", error);
+//     return { success: false, message: "Failed to delete opportunity" };
+//   }
+// };
