@@ -42,3 +42,22 @@ export const serverMutation = async ({ path, method, data }) => {
   });
   return res.json();
 };
+
+export const updateStartup = async (email, formData) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/startup/${email}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      },
+    );
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating startup:", error);
+    return { error: true, message: "Network error occurred" };
+  }
+};

@@ -17,9 +17,13 @@ import {
   Calendar,
   ShieldCheck,
   Sparkles,
+  Save,
+  XCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { addStartups, getStartupByEmail } from "@/lib/api/startups/action";
+// API route theke update function-ti import korun (Step 2 theke)
+import { updateStartup } from "@/lib/api/startups/action";
 import { useSession } from "@/lib/auth-client";
 import Image from "next/image";
 
@@ -29,6 +33,7 @@ const StartupPage = () => {
   const [pageLoading, setPageLoading] = useState(true);
   const [isLaunching, setIsLaunching] = useState(false);
   const [existingStartup, setExistingStartup] = useState(null);
+  const [isEditing, setIsEditing] = useState(false); // Edit state manage korar jonno
 
   const [formData, setFormData] = useState({
     startupName: "",
@@ -64,6 +69,21 @@ const StartupPage = () => {
 
     checkExistingStartup();
   }, [session]);
+
+  const handleEditClick = () => {
+    if (existingStartup) {
+      setFormData({
+        startupName: existingStartup.startupName || "",
+        logo: existingStartup.logo || "",
+        industry: existingStartup.industry || "",
+        description: existingStartup.description || "",
+        fundingStage: existingStartup.fundingStage || "",
+        founderEmail:
+          existingStartup.founderEmail || session?.user?.email || "",
+      });
+      setIsEditing(true);
+    }
+  };
 
   const handleLogoUpload = async (e) => {
     const file = e.target.files[0];
@@ -108,35 +128,50 @@ const StartupPage = () => {
     setLoading(true);
 
     try {
-      const data = await addStartups(formData);
+      if (isEditing) {
+        const data = await updateStartup(session.user.email, formData);
 
-      if (data && !data.error) {
-        toast.success("Data secured on blockchain incubator network!");
+        if (data && !data.error) {
+          toast.success("Startup core updated successfully! 🛠️");
 
-        setIsLaunching(true);
-
-        const nextStartupData = {
-          ...formData,
-          createdAt: new Date(),
-          status: "Active",
-        };
-
-        setTimeout(() => {
-          setExistingStartup(nextStartupData);
-          setIsLaunching(false);
-
-          setFormData({
-            startupName: "",
-            logo: "",
-            industry: "",
-            description: "",
-            fundingStage: "",
-            founderEmail: session?.user?.email || "",
+          setExistingStartup({
+            ...existingStartup,
+            ...formData,
           });
-          toast.success("Startup launched successfully! 🚀");
-        }, 2500);
+          setIsEditing(false);
+        } else {
+          toast.error(data.message || "Failed to update startup");
+        }
       } else {
-        toast.error(data.message || "Failed to create startup");
+        const data = await addStartups(formData);
+
+        if (data && !data.error) {
+          toast.success("Data secured on blockchain incubator network!");
+          setIsLaunching(true);
+
+          const nextStartupData = {
+            ...formData,
+            createdAt: new Date(),
+            status: "Active",
+          };
+
+          setTimeout(() => {
+            setExistingStartup(nextStartupData);
+            setIsLaunching(false);
+
+            setFormData({
+              startupName: "",
+              logo: "",
+              industry: "",
+              description: "",
+              fundingStage: "",
+              founderEmail: session?.user?.email || "",
+            });
+            toast.success("Startup launched successfully! 🚀");
+          }, 2500);
+        } else {
+          toast.error(data.message || "Failed to create startup");
+        }
       }
     } catch (error) {
       console.error(error);
@@ -162,15 +197,12 @@ const StartupPage = () => {
 
         <div className="relative flex items-center justify-center size-40 mb-8">
           <div className="absolute inset-0 rounded-full border-2 border-dashed border-indigo-500/20 animate-[spin_20s_linear_infinite]" />
-
           <div className="absolute inset-3 rounded-full border border-violet-500/40 p-1 animate-[spin_3s_linear_infinite]">
             <div className="size-2 rounded-full bg-violet-400 shadow-[0_0_15px_#a78bfa]" />
           </div>
-
           <div className="absolute inset-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 shadow-2xl flex items-center justify-center group">
             <Rocket className="text-indigo-400 size-10 animate-bounce transition-transform" />
           </div>
-
           <Sparkles className="absolute -top-2 -right-2 text-violet-400 size-5 animate-pulse" />
         </div>
 
@@ -201,28 +233,31 @@ const StartupPage = () => {
             Venture Hub
           </span>
           <h1 className="text-3xl sm:text-4xl font-black text-transparent mt-3 tracking-tight bg-linear-to-r from-zinc-100 via-zinc-200 to-zinc-400 bg-clip-text">
-            {existingStartup ? "Venture Profile" : "Forge New Startup"}
+            {existingStartup && !isEditing
+              ? "Venture Profile"
+              : isEditing
+                ? "Update Venture Core"
+                : "Forge New Startup"}
           </h1>
           <p className="text-zinc-400 text-sm mt-1.5 font-medium">
-            {existingStartup
+            {existingStartup && !isEditing
               ? "Monitor and manage your ecosystem presence from your command center."
-              : "Launch your innovative project into StartupForge's premium incubator network."}
+              : isEditing
+                ? "Modify your existing venture payload parameters. (Founder email locked)"
+                : "Launch your innovative project into StartupForge's premium incubator network."}
           </p>
         </div>
       </div>
 
-      {/* Conditional Rendering */}
-      {existingStartup ? (
+      {/* Conditional Rendering: If existing startup and NOT editing, show info view */}
+      {existingStartup && !isEditing ? (
         /* PREMIUM STARTUP INFO VIEW */
         <div className="relative overflow-hidden bg-linear-to-b from-zinc-900/50 to-zinc-950/80 backdrop-blur-xl border border-zinc-800/60 rounded-3xl p-6 md:p-10 shadow-2xl shadow-black/80 space-y-8 group transition-all duration-300 hover:border-zinc-700/60">
-          {/* Subtle Background Glow */}
           <div className="absolute -top-40 -right-40 w-96 h-96 bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none" />
           <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-violet-500/5 blur-[120px] rounded-full pointer-events-none" />
 
-          {/* Top Profile Header */}
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-6 border-b border-zinc-800/60">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 w-full">
-              {/* Premium Metallic Ring Frame */}
               <div className="relative size-24 rounded-2xl p-0.5 bg-linear-to-tr from-zinc-700 via-zinc-800 to-indigo-500/40 shadow-inner overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-300">
                 <div className="size-full rounded-[14px] overflow-hidden bg-zinc-950 flex items-center justify-center">
                   <Image
@@ -237,7 +272,7 @@ const StartupPage = () => {
 
               <div className="space-y-2">
                 <div className="flex flex-wrap items-center gap-2.5">
-                  <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-transparent">
+                  <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-zinc-100 via-zinc-200 to-zinc-400">
                     {existingStartup.startupName}
                   </h2>
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-sm">
@@ -254,10 +289,11 @@ const StartupPage = () => {
               </div>
             </div>
 
-            {/* Action Buttons */}
+            {/* Edit Button Handler Trigger */}
             <div className="flex items-center gap-3 w-full lg:w-auto border-t lg:border-t-0 pt-4 lg:pt-0 border-zinc-800/60">
               <button
                 type="button"
+                onClick={handleEditClick}
                 className="flex-1 lg:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-900/80 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/50 text-zinc-300 rounded-xl text-xs font-bold tracking-wide uppercase transition-all duration-200 shadow-sm hover:scale-[1.02] cursor-pointer"
               >
                 <Edit2 size={14} className="text-zinc-400" />
@@ -273,9 +309,7 @@ const StartupPage = () => {
             </div>
           </div>
 
-          {/* Metric Dashboard Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Stage Box */}
             <div className="p-4 bg-zinc-900/30 border border-zinc-800/40 rounded-xl relative overflow-hidden group/card hover:bg-zinc-900/50 transition-all">
               <div className="absolute top-0 right-0 p-3 text-zinc-800 group-hover/card:text-indigo-500/10 transition-colors">
                 <Coins size={40} />
@@ -289,7 +323,6 @@ const StartupPage = () => {
               </span>
             </div>
 
-            {/* Email Box */}
             <div className="p-4 bg-zinc-900/30 border border-zinc-800/40 rounded-xl relative overflow-hidden group/card hover:bg-zinc-900/50 transition-all">
               <div className="absolute top-0 right-0 p-3 text-zinc-800 group-hover/card:text-indigo-500/10 transition-colors">
                 <Mail size={40} />
@@ -302,7 +335,6 @@ const StartupPage = () => {
               </span>
             </div>
 
-            {/* Registered Box */}
             <div className="p-4 bg-zinc-900/30 border border-zinc-800/40 rounded-xl relative overflow-hidden group/card hover:bg-zinc-900/50 transition-all">
               <div className="absolute top-0 right-0 p-3 text-zinc-800 group-hover/card:text-indigo-500/10 transition-colors">
                 <Calendar size={40} />
@@ -314,18 +346,13 @@ const StartupPage = () => {
                 {existingStartup.createdAt
                   ? new Date(existingStartup.createdAt).toLocaleDateString(
                       "en-US",
-                      {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      },
+                      { month: "short", day: "numeric", year: "numeric" },
                     )
                   : "Verified Member"}
               </span>
             </div>
           </div>
 
-          {/* Detailed Pitch/Description */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <span className="size-1 bg-indigo-500 rounded-full" />
@@ -342,9 +369,9 @@ const StartupPage = () => {
           </div>
         </div>
       ) : (
-        /* CREATE STARTUP FORM VIEW */
+        /* CREATE / EDIT FORM VIEW */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Feature Card */}
+          {/* Left Feature Side Card */}
           <div className="lg:col-span-1 bg-linear-to-br from-indigo-600/10 via-transparent to-transparent border border-zinc-800/40 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden group">
             <div className="absolute top-[-20%] left-[-20%] w-40 h-40 bg-indigo-500/10 blur-[50px] rounded-full" />
             <div className="space-y-4 relative z-10">
@@ -352,12 +379,12 @@ const StartupPage = () => {
                 <Rocket className="text-indigo-400 animate-pulse" size={24} />
               </div>
               <h3 className="text-lg font-bold text-transparent">
-                Forge Your Vision
+                {isEditing ? "Modify Node Data" : "Forge Your Vision"}
               </h3>
               <p className="text-xs text-zinc-400 leading-relaxed">
-                Join our premium incubator ecosystem. Get access to funding
-                opportunities, top-tier collaborators, and real-time project
-                analytics.
+                {isEditing
+                  ? "Update parameters to map correct ecosystem details. Synchronization to primary database clusters happens in real-time."
+                  : "Join our premium incubator ecosystem. Get access to funding opportunities, top-tier collaborators, and real-time project analytics."}
               </p>
             </div>
             <div className="mt-8 pt-6 border-t border-zinc-900 space-y-3 relative z-10">
@@ -369,6 +396,15 @@ const StartupPage = () => {
                 <CheckCircle size={14} className="text-indigo-400" /> Instant
                 verification
               </div>
+              {isEditing && (
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="w-full mt-4 flex items-center justify-center gap-1.5 py-2 border border-zinc-800 hover:bg-zinc-900 hover:border-zinc-700 rounded-xl text-xs font-semibold text-zinc-400 cursor-pointer transition-all"
+                >
+                  <XCircle size={14} /> Cancel Edit
+                </button>
+              )}
             </div>
           </div>
 
@@ -533,10 +569,10 @@ const StartupPage = () => {
                   </div>
                 </div>
 
-                {/* Founder Email */}
+                {/* Founder Email - Locked with cursor-not-allowed */}
                 <div className="form-control w-full space-y-2">
                   <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                    Founder Email
+                    Founder Email (Immutable)
                   </label>
                   <div className="relative flex items-center">
                     <Mail size={16} className="absolute left-4 text-zinc-500" />
@@ -547,7 +583,7 @@ const StartupPage = () => {
                       required
                       disabled
                       value={formData.founderEmail}
-                      className="w-full bg-zinc-900/40 border border-zinc-800/80 focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/10 rounded-xl py-3 pl-11 pr-4 text-sm font-medium text-zinc-400 outline-none transition-all placeholder:text-zinc-600 cursor-not-allowed"
+                      className="w-full bg-zinc-950/80 border border-zinc-900 focus:ring-0 rounded-xl py-3 pl-11 pr-4 text-sm font-medium text-zinc-500 outline-none transition-all cursor-not-allowed border-dashed"
                     />
                   </div>
                 </div>
@@ -577,17 +613,29 @@ const StartupPage = () => {
                 </div>
               </div>
 
-              {/* Submit Button */}
+              {/* Dynamic Submit / Save Button */}
               <button
                 type="submit"
                 disabled={loading}
                 className="w-full flex items-center justify-center gap-2 py-3.5 bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/10 transition-all duration-300 disabled:opacity-50 cursor-pointer group"
               >
-                {loading ? "Launching..." : "Launch Startup"}
-                <ArrowRight
-                  size={16}
-                  className="group-hover:translate-x-1 transition-transform"
-                />
+                {isEditing ? (
+                  <>
+                    {loading ? "Saving Changes..." : "Save Changes"}
+                    <Save
+                      size={16}
+                      className="group-hover:scale-110 transition-transform"
+                    />
+                  </>
+                ) : (
+                  <>
+                    {loading ? "Launching..." : "Launch Startup"}
+                    <ArrowRight
+                      size={16}
+                      className="group-hover:translate-x-1 transition-transform"
+                    />
+                  </>
+                )}
               </button>
             </form>
           </div>
