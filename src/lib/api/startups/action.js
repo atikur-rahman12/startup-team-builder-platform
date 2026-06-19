@@ -122,16 +122,16 @@ export const updateOpportunity = async (id, formData) => {
   }
 };
 
-// // 🆕 Delete Opportunity
-// export const deleteOpportunity = async (id) => {
-//   try {
-//     const response = await fetch(
-//       `${process.env.NEXT_PUBLIC_API_URL}/api/opportunity/${id}`,
-//       { method: "DELETE" },
-//     );
-//     return await response.json();
-//   } catch (error) {
-//     console.error("Error deleting opportunity:", error);
-//     return { success: false, message: "Failed to delete opportunity" };
-//   }
-// };
+// 🆕 Delete Opportunity
+export const deleteOpportunity = async (id) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/opportunity/${id}`,
+      { method: "DELETE" },
+    );
+    return await response.json();
+  } catch (error) {
+    console.error("Error deleting opportunity:", error);
+    return { success: false, message: "Failed to delete opportunity" };
+  }
+};
