@@ -25,7 +25,7 @@ const FounderDashboard = () => {
 
   const userName = session?.user?.name || "Founder";
 
-  const isLimitReached = false;
+  const isLimitReached = true;
 
   const stats = {
     totalOpportunities: 12,

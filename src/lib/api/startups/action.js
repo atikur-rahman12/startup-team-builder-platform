@@ -78,3 +78,13 @@ export const deleteStartup = async (email) => {
     return { error: true, message: "Failed to request data node deletion." };
   }
 };
+
+// 🆕 Add Opportunity Action
+export const addOpportunity = async (data) => {
+  const resData = await serverMutation({
+    path: "api/opportunities",
+    method: "POST",
+    data: data,
+  });
+  return resData;
+};

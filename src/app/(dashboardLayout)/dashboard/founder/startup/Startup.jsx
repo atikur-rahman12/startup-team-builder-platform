@@ -20,6 +20,9 @@ import {
   Save,
   XCircle,
   AlertTriangle,
+  Clock,
+  XOctagon,
+  Lock,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import {
@@ -31,14 +34,16 @@ import {
 import { useSession } from "@/lib/auth-client";
 import Image from "next/image";
 
-const Startup = () => {
+const STATIC_ADMIN_STATUS = "Active";
+
+const StartupPage = () => {
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   const [isLaunching, setIsLaunching] = useState(false);
   const [existingStartup, setExistingStartup] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // মোডাল স্টেট
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     startupName: "",
@@ -90,7 +95,6 @@ const Startup = () => {
     }
   };
 
-  // ✨ Handle Delete Core Logic (মোডালের ভেতরের ডিলিট বাটনের জন্য)
   const handleConfirmDelete = async () => {
     if (!session?.user?.email) {
       toast.error("User session missing!");
@@ -98,15 +102,13 @@ const Startup = () => {
     }
 
     setLoading(true);
-    setIsDeleteModalOpen(false); // মোডাল ক্লোজ করে দেওয়া হলো
+    setIsDeleteModalOpen(false);
 
     try {
       const data = await deleteStartup(session.user.email);
 
       if (data && !data.error) {
         toast.success("Startup successfully removed from ecosystem! 🗑️");
-
-        // Dynamically shift visual state back to create mode structure
         setExistingStartup(null);
         setIsEditing(false);
         setFormData({
@@ -132,7 +134,7 @@ const Startup = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    loading(true);
+    setLoading(true); // 🛠️ Fixed typo from 'loading(true)' to 'setLoading(true)'
     const imgbbApiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
     const apiFormData = new FormData();
     apiFormData.append("image", file);
@@ -176,7 +178,6 @@ const Startup = () => {
 
         if (data && !data.error) {
           toast.success("Startup core updated successfully! 🛠️");
-
           setExistingStartup({
             ...existingStartup,
             ...formData,
@@ -195,7 +196,6 @@ const Startup = () => {
           const nextStartupData = {
             ...formData,
             createdAt: new Date(),
-            status: "Active",
           };
 
           setTimeout(() => {
@@ -317,10 +317,29 @@ const Startup = () => {
                   <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-zinc-100 via-zinc-200 to-zinc-400">
                     {existingStartup.startupName}
                   </h2>
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-sm">
-                    <ShieldCheck size={12} />
-                    {existingStartup.status || "Active"}
-                  </span>
+
+                  {/* 🆕 DYNAMIC BADGE SYSTEM BASED ON STATIC STATUS */}
+                  {STATIC_ADMIN_STATUS === "Active" && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-sm animate-fadeIn">
+                      <ShieldCheck size={12} />
+                      Active
+                    </span>
+                  )}
+                  {STATIC_ADMIN_STATUS === "Pending" && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-amber-500/10 border border-amber-500/20 text-amber-400 shadow-sm animate-pulse">
+                      <Clock
+                        size={12}
+                        className="animate-spin [animation-duration:3s]"
+                      />
+                      Pending Approval
+                    </span>
+                  )}
+                  {STATIC_ADMIN_STATUS === "Rejected" && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-rose-500/10 border border-rose-500/20 text-rose-400 shadow-sm animate-fadeIn">
+                      <XOctagon size={12} />
+                      Rejected
+                    </span>
+                  )}
                 </div>
                 <div className="flex flex-wrap items-center gap-2 text-zinc-400 text-sm">
                   <span className="px-2.5 py-1 bg-zinc-900/80 border border-zinc-800 rounded-lg font-medium text-xs text-indigo-300 flex items-center gap-1.5">
@@ -341,7 +360,6 @@ const Startup = () => {
                 Edit
               </button>
 
-              {/* Trigger custom delete modal instead of window.confirm */}
               <button
                 type="button"
                 disabled={loading}
@@ -405,11 +423,72 @@ const Startup = () => {
                 Executive Abstract & Core Problem Statement
               </span>
             </div>
+
+            {/* 🆕 PREMIUM DYNAMIC DESCRIPTION VIEW */}
             <div className="relative group/pitch">
-              <div className="absolute -inset-px bg-linear-to-r from-indigo-500/10 to-transparent rounded-2xl opacity-0 group-hover/pitch:opacity-100 transition-opacity duration-300 pointer-events-none" />
-              <div className="p-5 sm:p-6 bg-zinc-900/20 border border-zinc-800/60 rounded-2xl text-sm sm:text-base text-zinc-300 leading-relaxed font-normal shadow-inner">
-                {existingStartup.description}
-              </div>
+              {STATIC_ADMIN_STATUS === "Active" ? (
+                <>
+                  {/* 🟩 Active View (Original Pitch) */}
+                  <div className="absolute -inset-px bg-linear-to-r from-indigo-500/10 to-transparent rounded-2xl opacity-0 group-hover/pitch:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  <div className="p-5 sm:p-6 bg-zinc-900/20 border border-zinc-800/60 rounded-2xl text-sm sm:text-base text-zinc-300 leading-relaxed font-normal shadow-inner animate-fadeIn">
+                    {existingStartup.description}
+                  </div>
+                </>
+              ) : STATIC_ADMIN_STATUS === "Pending" ? (
+                <>
+                  {/* 🟨 Pending View (Premium Glassmorphism Locked Msg) */}
+                  <div className="absolute -inset-px bg-linear-to-r from-amber-500/10 to-transparent rounded-2xl pointer-events-none" />
+                  <div className="p-6 bg-zinc-900/10 border border-amber-500/20 rounded-2xl text-zinc-300 leading-relaxed font-normal shadow-2xl relative overflow-hidden backdrop-blur-xs flex flex-col sm:flex-row items-center sm:items-start gap-4 animate-fadeIn">
+                    <div className="absolute top-0 right-0 p-8 text-amber-500/5 pointer-events-none">
+                      <Lock size={120} />
+                    </div>
+                    <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400 shrink-0">
+                      <Clock
+                        size={20}
+                        className="animate-spin [animation-duration:4s]"
+                      />
+                    </div>
+                    <div className="space-y-2 text-center sm:text-left">
+                      <h4 className="text-sm font-bold text-amber-400/90 tracking-wide uppercase">
+                        Core Abstract Locked — Review In Progress
+                      </h4>
+                      <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-2xl">
+                        Your venture core configuration has been successfully
+                        encrypted and routed to the StartupForge Review Board.
+                        Until the verification cycle completes, your public
+                        abstract remains securely hidden from ecosystem nodes.
+                      </p>
+                      <div className="inline-flex items-center gap-1.5 pt-1 text-[11px] font-semibold text-zinc-500 tracking-wider uppercase">
+                        <span className="size-1.5 rounded-full bg-amber-500 animate-ping" />
+                        Awaiting Admin Validation Signature
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* 🟥 Rejected View (Premium Error/Rejected Msg) */}
+                  <div className="absolute -inset-px bg-linear-to-r from-rose-500/10 to-transparent rounded-2xl pointer-events-none" />
+                  <div className="p-6 bg-zinc-900/10 border border-rose-500/20 rounded-2xl text-zinc-300 leading-relaxed font-normal shadow-2xl relative overflow-hidden backdrop-blur-xs flex flex-col sm:flex-row items-center sm:items-start gap-4 animate-fadeIn">
+                    <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 shrink-0">
+                      <XOctagon size={20} />
+                    </div>
+                    <div className="space-y-2 text-center sm:text-left">
+                      <h4 className="text-sm font-bold text-rose-400/90 tracking-wide uppercase">
+                        Venture Verification Rejected
+                      </h4>
+                      <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-2xl">
+                        The StartupForge validation board was unable to
+                        authorize your current venture profile parameters.
+                        Please click the{" "}
+                        <strong className="text-zinc-200">Edit</strong> button
+                        above to revise your core abstract data or compliance
+                        parameters and re-submit for audit.
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -422,7 +501,7 @@ const Startup = () => {
               <div className="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl w-fit">
                 <Rocket className="text-indigo-400 animate-pulse" size={24} />
               </div>
-              <h3 className="text-lg font-bold text-transparent">
+              <h3 className="text-lg font-bold text-zinc-100">
                 {isEditing ? "Modify Node Data" : "Forge Your Vision"}
               </h3>
               <p className="text-xs text-zinc-400 leading-relaxed">
@@ -677,11 +756,10 @@ const Startup = () => {
         </div>
       )}
 
-      {/* ⚠️ CUSTOM CONFIRMATION MODAL */}
+      {/* CUSTOM CONFIRMATION MODAL */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-sm bg-zinc-950 border border-zinc-800/80 rounded-2xl p-6 shadow-2xl space-y-6 relative overflow-hidden animate-scaleIn">
-            {/* Background Glow */}
             <div className="absolute -top-10 -right-10 w-24 h-24 bg-rose-500/10 blur-xl rounded-full pointer-events-none" />
 
             <div className="flex items-start gap-4">
@@ -722,4 +800,4 @@ const Startup = () => {
   );
 };
 
-export default Startup;
+export default StartupPage;
