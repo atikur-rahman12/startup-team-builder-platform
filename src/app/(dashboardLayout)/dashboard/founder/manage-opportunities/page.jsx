@@ -85,24 +85,24 @@ const ManageOpportunitiesPage = () => {
     document.getElementById("edit_opportunity_modal").showModal();
   };
 
-//   const handleUpdate = async (e) => {
-//     e.preventDefault();
-//     setActionLoading(true);
-//     try {
-//       const res = await updateOpportunity(editingItem._id, editForm);
-//       if (res.success) {
-//         toast.success("Opportunity dynamically updated! 🌟");
-//         document.getElementById("edit_opportunity_modal").close();
-//         fetchOpportunities();
-//       } else {
-//         toast.error(res.message || "Failed to update node.");
-//       }
-//     } catch (error) {
-//       toast.error("Network synchronization failed.");
-//     } finally {
-//       setActionLoading(false);
-//     }
-//   };
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setActionLoading(true);
+    try {
+      const res = await updateOpportunity(editingItem._id, editForm);
+      if (res.success) {
+        toast.success("Opportunity dynamically updated! 🌟");
+        document.getElementById("edit_opportunity_modal").close();
+        fetchOpportunities();
+      } else {
+        toast.error(res.message || "Failed to update node.");
+      }
+    } catch (error) {
+      toast.error("Network synchronization failed.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
 //   const openDeleteModal = (id) => {
 //     setDeletingId(id);
