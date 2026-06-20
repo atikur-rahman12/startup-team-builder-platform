@@ -135,3 +135,11 @@ export const deleteOpportunity = async (id) => {
     return { success: false, message: "Failed to delete opportunity" };
   }
 };
+
+// Upgrade Premium User
+export const upgradeToPremium = async (email) => {
+  return await serverMutation({
+    path: `api/users/upgrade-premium/${email}`,
+    method: "PATCH",
+  });
+};

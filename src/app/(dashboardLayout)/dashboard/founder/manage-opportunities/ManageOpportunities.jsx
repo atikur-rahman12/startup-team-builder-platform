@@ -121,7 +121,7 @@ const ManageOpportunities = () => {
         );
         document.getElementById("delete_opportunity_modal").close();
       } else {
-        toast.error(res.message || "Termination blocked.");
+        toast.error(res.message);
       }
     } catch (error) {
       toast.error("Request execution failed.");

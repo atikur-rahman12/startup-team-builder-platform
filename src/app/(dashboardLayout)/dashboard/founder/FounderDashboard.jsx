@@ -23,6 +23,7 @@ import Link from "next/link";
 
 const FounderDashboard = () => {
   const { data: session } = useSession();
+  const isPremium = session?.user?.isPremium ?? false;
 
   const userName = session?.user?.name || "Founder";
 
@@ -75,7 +76,6 @@ const FounderDashboard = () => {
 
   return (
     <div className="space-y-8 animate-fadeIn">
-      {/* 1. Header Section */}
       <div className="relative p-6 sm:p-8 rounded-2xl bg-zinc-900/20 border border-zinc-800/40 backdrop-blur-md overflow-hidden">
         <div className="absolute top-0 right-0 w-62.5 h-62.5 bg-indigo-500/5 blur-[80px] rounded-full pointer-events-none" />
 
@@ -93,39 +93,70 @@ const FounderDashboard = () => {
         </div>
       </div>
 
-      {/* 2. Premium Upgrade Banner */}
-      <div className="relative p-6 rounded-2xl border border-indigo-500/30 bg-linear-to-r from-indigo-500/10 via-purple-500/5 to-transparent backdrop-blur-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 overflow-hidden group">
-        <div className="absolute -left-10 -top-10 w-40 h-40 bg-indigo-500/10 blur-3xl rounded-full pointer-events-none" />
-        <div className="absolute right-20 bottom-0 w-32 h-32 bg-purple-500/5 blur-3xl rounded-full pointer-events-none" />
+      {isPremium ? (
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-6 backdrop-blur-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div className="flex items-start gap-4">
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+              <Crown size={22} className="text-emerald-400" />
+            </div>
 
-        <div className="flex items-start gap-4 relative z-10">
-          <div className="p-3 rounded-xl bg-linear-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 text-indigo-400 shrink-0 shadow-lg shadow-indigo-500/5 group-hover:scale-105 transition-transform duration-300">
-            <Crown size={22} className="animate-pulse" />
+            <div>
+              <h4 className="text-lg font-bold text-emerald-400">
+                ✨ Premium Account Active
+              </h4>
+
+              <p className="text-sm text-zinc-400 mt-2 leading-relaxed max-w-2xl">
+                Enjoy unlimited opportunity postings, priority visibility,
+                advanced recruitment tools, applicant insights, and premium
+                founder features.
+              </p>
+            </div>
           </div>
-          <div>
-            <h4 className="text-sm font-bold text-zinc-100 tracking-wide flex items-center gap-2">
-              Unlock the Full Potential of Your Incubator
-              <span className="text-[10px] bg-indigo-500/20 text-indigo-300 font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider border border-indigo-500/30">
-                PRO PLAN
-              </span>
-            </h4>
-            <p className="text-xs text-zinc-400 mt-1.5 max-w-2xl font-medium leading-relaxed">
-              Upgrade to Premium today to get advanced applicant matching
-              analytics, unlimited workspace opportunities, automated email
-              follow-ups, and exclusive deep-dive insights to help scale your
-              ecosystem efficiently.
-            </p>
-          </div>
+
+          <Link
+            href="/dashboard/founder/add-opportunity"
+            className="shrink-0 w-full sm:w-auto px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2"
+          >
+            Start Adding Opportunities
+            <ArrowUpRight size={16} />
+          </Link>
         </div>
+      ) : (
+        <div className="relative p-6 rounded-2xl border border-indigo-500/30 bg-linear-to-r from-indigo-500/10 via-purple-500/5 to-transparent backdrop-blur-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 overflow-hidden group">
+          <div className="absolute -left-10 -top-10 w-40 h-40 bg-indigo-500/10 blur-3xl rounded-full pointer-events-none" />
+          <div className="absolute right-20 bottom-0 w-32 h-32 bg-purple-500/5 blur-3xl rounded-full pointer-events-none" />
 
-        <Link
-          href={"/dashboard/founder/premium-plan"}
-          className="relative z-10 shrink-0 w-full sm:w-auto px-5 py-3 bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-zinc-50 text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-xl shadow-indigo-500/20 transition-all duration-300 transform active:scale-95 group-hover:shadow-purple-500/20"
-        >
-          Upgrade to Premium
-          <ArrowUpRight size={14} strokeWidth={2.5} />
-        </Link>
-      </div>
+          <div className="flex items-start gap-4 relative z-10">
+            <div className="p-3 rounded-xl bg-linear-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 text-indigo-400 shrink-0 shadow-lg shadow-indigo-500/5 group-hover:scale-105 transition-transform duration-300">
+              <Crown size={22} className="animate-pulse" />
+            </div>
+
+            <div>
+              <h4 className="text-sm font-bold text-zinc-100 tracking-wide flex items-center gap-2">
+                Unlock the Full Potential of Your Incubator
+                <span className="text-[10px] bg-indigo-500/20 text-indigo-300 font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider border border-indigo-500/30">
+                  PRO PLAN
+                </span>
+              </h4>
+
+              <p className="text-xs text-zinc-400 mt-1.5 max-w-2xl font-medium leading-relaxed">
+                Upgrade to Premium today to get advanced applicant matching
+                analytics, unlimited workspace opportunities, automated email
+                follow-ups, and exclusive deep-dive insights to help scale your
+                ecosystem efficiently.
+              </p>
+            </div>
+          </div>
+
+          <Link
+            href="/dashboard/founder/premium-plan"
+            className="relative z-10 shrink-0 w-full sm:w-auto px-5 py-3 bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-zinc-50 text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-xl shadow-indigo-500/20 transition-all duration-300 transform active:scale-95 group-hover:shadow-purple-500/20"
+          >
+            Upgrade to Premium
+            <ArrowUpRight size={14} strokeWidth={2.5} />
+          </Link>
+        </div>
+      )}
 
       {/* 3. Overview Analytics Grid */}
       <div>

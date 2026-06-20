@@ -99,7 +99,6 @@ const AddOpportunity = () => {
       return;
     }
 
-    // ব্যাকএন্ড সেফটি চেকে যদি লিমিট ০ থাকে তবে ফ্রন্টএন্ড থেকেও সাবমিট ব্লক করা হলো
     if (
       opportunityStats &&
       !opportunityStats.isPremium &&
@@ -124,7 +123,6 @@ const AddOpportunity = () => {
     try {
       const response = await addOpportunity(payload);
 
-      // যদি ব্যাকএন্ড থেকে সাকসেস বা মেম্বারশিপ লক এর কোনো মেসেজ আসে
       if (response?.success || response?.insertedId) {
         toast.success("Opportunity published to talent ecosystem! 🚀");
 
@@ -172,7 +170,6 @@ const AddOpportunity = () => {
 
   const isVentureApproved = startupInfo?.status === "approved";
 
-  // ইউজার ফ্রি প্ল্যানে ৩টি পোস্ট শেষ করে ফেললে ফর্ম এবং বাটন ডিসেবল করার কন্ডিশন
   const isFormDisabled =
     !isVentureApproved ||
     (opportunityStats &&
@@ -181,7 +178,6 @@ const AddOpportunity = () => {
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-8 px-4 sm:px-6 lg:px-0 py-8 animate-fadeIn">
-      {/* 🌟 HEADER SECTION */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-zinc-800/80 pb-6">
         <div>
           <span className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 tracking-widest uppercase bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20 shadow-xs">
@@ -198,8 +194,7 @@ const AddOpportunity = () => {
         </div>
       </div>
 
-      {/* 📊 STATS & LIMIT LIMITATION SECTION */}
-      {opportunityStats && (
+      {opportunityStats && !opportunityStats.isPremium && (
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-5">
           <div className="flex justify-between items-center">
             <div>
@@ -309,18 +304,6 @@ const AddOpportunity = () => {
                 </div>
               )}
             </>
-          )}
-
-          {opportunityStats.isPremium && (
-            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4">
-              <p className="text-emerald-400 font-semibold">
-                ✨ Premium Account Active
-              </p>
-              <p className="text-sm text-zinc-400 mt-1">
-                Enjoy unlimited opportunity postings, priority visibility, and
-                advanced recruitment features.
-              </p>
-            </div>
           )}
         </div>
       )}

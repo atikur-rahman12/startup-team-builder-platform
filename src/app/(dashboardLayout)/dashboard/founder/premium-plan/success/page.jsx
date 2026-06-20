@@ -1,10 +1,10 @@
-import { redirect } from "next/navigation";
-
 import { ArrowRight, Crown, Loader2 } from "lucide-react";
 import { stripe } from "@/lib/stripe";
 
 import Link from "next/link";
 import PaymentSuccessToast from "@/components/PaymentSuccessToast";
+import { upgradeToPremium } from "@/lib/api/startups/action";
+import { Toaster } from "react-hot-toast";
 
 export default async function Success({ searchParams }) {
   const { session_id } = await searchParams;
@@ -16,10 +16,23 @@ export default async function Success({ searchParams }) {
     expand: ["line_items", "payment_intent"],
   });
 
-  console.log(session);
+  if (session.payment_status === "paid") {
+    await upgradeToPremium(session.customer_email);
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-900 via-indigo-950 to-slate-900 flex items-center justify-center p-4 antialiased">
+      {/* 👇 ADD TOASTER HERE */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: "#0f172a",
+            color: "#fff",
+            border: "1px solid rgba(255,255,255,0.1)",
+          },
+        }}
+      />
       <PaymentSuccessToast />
 
       {/* Main Card */}
