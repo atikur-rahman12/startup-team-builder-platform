@@ -7,7 +7,7 @@ import {
   Users,
   ArrowUpRight,
   BarChart3,
-  Sparkles,
+  Crown,
 } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import {
@@ -100,7 +100,7 @@ const FounderDashboard = () => {
 
         <div className="flex items-start gap-4 relative z-10">
           <div className="p-3 rounded-xl bg-linear-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 text-indigo-400 shrink-0 shadow-lg shadow-indigo-500/5 group-hover:scale-105 transition-transform duration-300">
-            <Sparkles size={22} className="animate-pulse" />
+            <Crown size={22} className="animate-pulse" />
           </div>
           <div>
             <h4 className="text-sm font-bold text-zinc-100 tracking-wide flex items-center gap-2">
