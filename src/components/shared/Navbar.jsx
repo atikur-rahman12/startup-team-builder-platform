@@ -80,7 +80,11 @@ const Navbar = () => {
 
   const publicLinks = [
     { name: "Home", href: "/", icon: <Home size={16} /> },
-    { name: "Browse Startups", href: "/startups", icon: <Layers size={16} /> },
+    {
+      name: "Browse Startups",
+      href: "/browse-startups",
+      icon: <Layers size={16} />,
+    },
     {
       name: "Browse Opportunities",
       href: "/opportunities",

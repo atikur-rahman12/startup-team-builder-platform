@@ -143,3 +143,35 @@ export const upgradeToPremium = async (email) => {
     method: "PATCH",
   });
 };
+
+// Get All Approve Startups
+export const getAllApprovedStartups = async () => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/startups/approved`,
+      { cache: "no-store" },
+    );
+
+    if (!response.ok) return [];
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching approved startups:", error);
+    return [];
+  }
+};
+
+// Get Opportunities by Startup ID
+export const getOpportunitiesByStartupId = async (startupId) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/opportunities/startup/${startupId}`,
+      { cache: "no-store" },
+    );
+
+    if (!response.ok) return [];
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching opportunities by startup ID:", error);
+    return [];
+  }
+};
