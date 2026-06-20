@@ -21,11 +21,14 @@ export const auth = betterAuth({
         required: false,
         defaultValue: "collaborator",
       },
-      // plan: {
-      //   type: "string",
-      //   required: false,
-      //   defaultValue: "founder_free",
-      // },
+      isBlocked: {
+        type: "boolean",
+        defaultValue: false,
+      },
+      isPremium: {
+        type: "boolean",
+        defaultValue: false,
+      },
     },
   },
 });

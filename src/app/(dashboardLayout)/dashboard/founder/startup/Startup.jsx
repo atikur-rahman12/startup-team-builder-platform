@@ -34,7 +34,7 @@ import {
 import { useSession } from "@/lib/auth-client";
 import Image from "next/image";
 
-const STATIC_ADMIN_STATUS = "Active";
+const STATIC_ADMIN_STATUS = "Approved";
 
 const StartupPage = () => {
   const { data: session } = useSession();
@@ -319,10 +319,10 @@ const StartupPage = () => {
                   </h2>
 
                   {/* 🆕 DYNAMIC BADGE SYSTEM BASED ON STATIC STATUS */}
-                  {STATIC_ADMIN_STATUS === "Active" && (
+                  {STATIC_ADMIN_STATUS === "Approved" && (
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-sm animate-fadeIn">
                       <ShieldCheck size={12} />
-                      Active
+                      Approved
                     </span>
                   )}
                   {STATIC_ADMIN_STATUS === "Pending" && (
@@ -426,9 +426,9 @@ const StartupPage = () => {
 
             {/* 🆕 PREMIUM DYNAMIC DESCRIPTION VIEW */}
             <div className="relative group/pitch">
-              {STATIC_ADMIN_STATUS === "Active" ? (
+              {STATIC_ADMIN_STATUS === "Approved" ? (
                 <>
-                  {/* 🟩 Active View (Original Pitch) */}
+                  {/* 🟩 Approved View (Original Pitch) */}
                   <div className="absolute -inset-px bg-linear-to-r from-indigo-500/10 to-transparent rounded-2xl opacity-0 group-hover/pitch:opacity-100 transition-opacity duration-300 pointer-events-none" />
                   <div className="p-5 sm:p-6 bg-zinc-900/20 border border-zinc-800/60 rounded-2xl text-sm sm:text-base text-zinc-300 leading-relaxed font-normal shadow-inner animate-fadeIn">
                     {existingStartup.description}

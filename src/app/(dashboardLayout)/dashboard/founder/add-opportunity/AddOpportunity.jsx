@@ -19,6 +19,7 @@ import { addOpportunity, getStartupByEmail } from "@/lib/api/startups/action";
 
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
+import Link from "next/link";
 
 const AddOpportunity = () => {
   const { data: session, isPending: authLoading } = authClient.useSession();
@@ -27,6 +28,7 @@ const AddOpportunity = () => {
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   const [startupInfo, setStartupInfo] = useState(null);
+  const [opportunityStats, setOpportunityStats] = useState(null);
 
   const [formData, setFormData] = useState({
     roleTitle: "",
@@ -35,6 +37,18 @@ const AddOpportunity = () => {
     commitmentLevel: "",
     deadline: "",
   });
+
+  const fetchOpportunityStats = async () => {
+    if (!userEmail) return;
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/opportunities/count/${userEmail}`,
+    );
+
+    const data = await res.json();
+
+    setOpportunityStats(data);
+  };
 
   useEffect(() => {
     const fetchStartup = async () => {
@@ -46,8 +60,9 @@ const AddOpportunity = () => {
       try {
         const data = await getStartupByEmail(userEmail);
         setStartupInfo(data);
+        await fetchOpportunityStats();
       } catch (err) {
-        console.error("Failed to load startup info", err);
+        console.error(err);
       } finally {
         setPageLoading(false);
       }
@@ -79,8 +94,20 @@ const AddOpportunity = () => {
       return;
     }
 
-    if (startupInfo.status !== "active") {
+    if (startupInfo.status !== "approved") {
       toast.error(`Venture is ${startupInfo.status}. Action prohibited.`);
+      return;
+    }
+
+    // ব্যাকএন্ড সেফটি চেকে যদি লিমিট ০ থাকে তবে ফ্রন্টএন্ড থেকেও সাবমিট ব্লক করা হলো
+    if (
+      opportunityStats &&
+      !opportunityStats.isPremium &&
+      opportunityStats.remaining === 0
+    ) {
+      toast.error(
+        "Your free limit is over. Please wait 1 month from your last post.",
+      );
       return;
     }
 
@@ -97,6 +124,7 @@ const AddOpportunity = () => {
     try {
       const response = await addOpportunity(payload);
 
+      // যদি ব্যাকএন্ড থেকে সাকসেস বা মেম্বারশিপ লক এর কোনো মেসেজ আসে
       if (response?.success || response?.insertedId) {
         toast.success("Opportunity published to talent ecosystem! 🚀");
 
@@ -107,6 +135,8 @@ const AddOpportunity = () => {
           commitmentLevel: "",
           deadline: "",
         });
+
+        await fetchOpportunityStats();
       } else {
         toast.error(response?.message || "Failed to deploy opportunity.");
       }
@@ -140,7 +170,14 @@ const AddOpportunity = () => {
     );
   }
 
-  const isVentureActive = startupInfo?.status === "active";
+  const isVentureApproved = startupInfo?.status === "approved";
+
+  // ইউজার ফ্রি প্ল্যানে ৩টি পোস্ট শেষ করে ফেললে ফর্ম এবং বাটন ডিসেবল করার কন্ডিশন
+  const isFormDisabled =
+    !isVentureApproved ||
+    (opportunityStats &&
+      !opportunityStats.isPremium &&
+      opportunityStats.remaining === 0);
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-8 px-4 sm:px-6 lg:px-0 py-8 animate-fadeIn">
@@ -161,6 +198,134 @@ const AddOpportunity = () => {
         </div>
       </div>
 
+      {/* 📊 STATS & LIMIT LIMITATION SECTION */}
+      {opportunityStats && (
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-5">
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="text-lg font-bold text-white">
+                Opportunity Usage
+              </h3>
+              <p className="text-sm text-zinc-400">
+                {opportunityStats.isPremium
+                  ? "Premium founders can publish unlimited opportunities."
+                  : `${opportunityStats.total} of ${opportunityStats.limit} opportunities used.`}
+              </p>
+            </div>
+
+            {opportunityStats.isPremium ? (
+              <span className="px-4 py-2 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-semibold">
+                PREMIUM
+              </span>
+            ) : (
+              <span className="px-4 py-2 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-semibold">
+                FREE PLAN
+              </span>
+            )}
+          </div>
+
+          {!opportunityStats.isPremium && (
+            <>
+              <div className="w-full h-3 rounded-full bg-zinc-800 overflow-hidden">
+                <div
+                  className={`h-full transition-all duration-500 ${
+                    opportunityStats.total >= 3
+                      ? "bg-red-500"
+                      : opportunityStats.total === 2
+                        ? "bg-orange-500"
+                        : "bg-emerald-500"
+                  }`}
+                  style={{
+                    width: `${(opportunityStats.total / opportunityStats.limit) * 100}%`,
+                  }}
+                />
+              </div>
+
+              <div className="flex justify-between text-xs">
+                <span className="text-zinc-500">
+                  Used: {opportunityStats.total}
+                </span>
+                <span className="text-zinc-500">
+                  Remaining: {opportunityStats.remaining}
+                </span>
+              </div>
+
+              {/* 👇 ১ মাসের নোটিশ লক বক্স এখানে আপডেট করা হয়েছে */}
+              {opportunityStats.remaining === 0 ? (
+                <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4">
+                  <p className="text-red-400 font-medium flex items-center gap-2">
+                    🚫 Free plan limit reached (Locked for 1 Month)
+                  </p>
+                  <p className="text-sm text-zinc-400 mt-1 mb-2 leading-relaxed">
+                    You have used all 3 free opportunities. Your limit will
+                    automatically reset <b>1 month</b> after your last post.
+                    Upgrade to Premium to bypass this restriction instantly.
+                  </p>
+                  <Link
+                    type="button"
+                    href={"/dashboard/founder/premium-plan"}
+                    className="mt-4 px-5 py-2 text-xs rounded-lg bg-linear-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold transition cursor-pointer"
+                  >
+                    Instant Premium Upgrade ⚡
+                  </Link>
+                </div>
+              ) : opportunityStats.remaining === 1 ? (
+                <div className="rounded-xl border border-orange-500/20 bg-orange-500/10 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <p className="text-orange-400 font-medium">
+                      ⚠ Only 1 opportunity remaining.
+                    </p>
+                    <p className="text-sm text-zinc-400 mt-1">
+                      Upgrade to Premium before reaching the limit and continue
+                      recruiting without restrictions.
+                    </p>
+                  </div>
+                  <Link
+                    type="button"
+                    href={"/dashboard/founder/premium-plan"}
+                    className="px-5 py-2.5 rounded-lg bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-zinc-950 font-bold text-sm shadow-md shadow-orange-500/10 transition shrink-0 cursor-pointer"
+                  >
+                    Go Premium ✨
+                  </Link>
+                </div>
+              ) : (
+                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <p className="text-emerald-400 font-medium">
+                      You're doing great!
+                    </p>
+                    <p className="text-sm text-zinc-400 mt-1">
+                      You still have <b>{opportunityStats.remaining}</b>{" "}
+                      opportunity slots available on your Free plan.
+                    </p>
+                  </div>
+                  <Link
+                    type="button"
+                    href={"/dashboard/founder/premium-plan"}
+                    className="px-5 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-500/20 hover:border-amber-500/40 font-semibold text-sm transition shrink-0 cursor-pointer"
+                  >
+                    Upgrade to Premium
+                  </Link>
+                </div>
+              )}
+            </>
+          )}
+
+          {opportunityStats.isPremium && (
+            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4">
+              <p className="text-emerald-400 font-semibold">
+                ✨ Premium Account Active
+              </p>
+              <p className="text-sm text-zinc-400 mt-1">
+                Enjoy unlimited opportunity postings, priority visibility, and
+                advanced recruitment features.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 🏢 STARTUP PROFILE VALIDATION */}
       {startupInfo ? (
         <div className="space-y-4">
           <div className="relative overflow-hidden bg-linear-to-r from-zinc-900/40 to-zinc-950/60 backdrop-blur-xl border border-zinc-800/60 rounded-2xl p-5 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-5 group transition-all duration-300 hover:border-zinc-700/60">
@@ -173,8 +338,8 @@ const AddOpportunity = () => {
                 <Image
                   src={startupInfo.logo}
                   alt={startupInfo.startupName}
-                  height={180}
-                  width={180}
+                  height={80}
+                  width={80}
                   className="w-full h-full object-cover rounded-lg"
                 />
               </div>
@@ -194,14 +359,14 @@ const AddOpportunity = () => {
 
             <div
               className={`flex items-center gap-2 px-3 py-1.5 border rounded-lg text-xs font-semibold shadow-xs relative z-10 ${
-                isVentureActive
+                isVentureApproved
                   ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
                   : startupInfo.status === "pending"
                     ? "bg-amber-500/10 border-amber-500/20 text-amber-400"
                     : "bg-red-500/10 border-red-500/20 text-red-400"
               }`}
             >
-              {isVentureActive ? (
+              {isVentureApproved ? (
                 <CheckCircle size={14} />
               ) : startupInfo.status === "pending" ? (
                 <AlertCircle size={14} />
@@ -212,7 +377,7 @@ const AddOpportunity = () => {
             </div>
           </div>
 
-          {!isVentureActive && (
+          {!isVentureApproved && (
             <div
               className={`p-4 border rounded-xl flex items-center gap-3 text-sm font-medium ${
                 startupInfo.status === "pending"
@@ -287,7 +452,7 @@ const AddOpportunity = () => {
                   type="text"
                   name="roleTitle"
                   required
-                  disabled={!isVentureActive}
+                  disabled={isFormDisabled}
                   placeholder="e.g., Lead Full-Stack Engineer, Co-Founder"
                   value={formData.roleTitle}
                   onChange={handleChange}
@@ -307,7 +472,7 @@ const AddOpportunity = () => {
                   type="text"
                   name="requiredSkills"
                   required
-                  disabled={!isVentureActive}
+                  disabled={isFormDisabled}
                   placeholder="e.g., React, Tailwind CSS, Node.js (Comma separated)"
                   value={formData.requiredSkills}
                   onChange={handleChange}
@@ -330,7 +495,7 @@ const AddOpportunity = () => {
                   <select
                     name="workType"
                     required
-                    disabled={!isVentureActive}
+                    disabled={isFormDisabled}
                     value={formData.workType}
                     onChange={handleChange}
                     className="select w-full bg-zinc-900/40 border border-zinc-800/80 focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/10 rounded-xl pl-11 pr-4 text-sm font-medium text-zinc-200 outline-none transition-all min-h-fit h-11.5 select-bordered disabled:opacity-50 disabled:cursor-not-allowed"
@@ -376,7 +541,7 @@ const AddOpportunity = () => {
                   <select
                     name="commitmentLevel"
                     required
-                    disabled={!isVentureActive}
+                    disabled={isFormDisabled}
                     value={formData.commitmentLevel}
                     onChange={handleChange}
                     className="select w-full bg-zinc-900/40 border border-zinc-800/80 focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/10 rounded-xl pl-11 pr-4 text-sm font-medium text-zinc-200 outline-none transition-all min-h-fit h-11.5 select-bordered disabled:opacity-50 disabled:cursor-not-allowed"
@@ -428,7 +593,7 @@ const AddOpportunity = () => {
                   type="date"
                   name="deadline"
                   required
-                  disabled={!isVentureActive}
+                  disabled={isFormDisabled}
                   value={formData.deadline}
                   onChange={handleChange}
                   className="w-full bg-zinc-900/40 border border-zinc-800/80 focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/10 rounded-xl py-3 pl-11 pr-4 text-sm font-medium text-zinc-200 outline-none transition-all scheme-dark disabled:opacity-50 disabled:cursor-not-allowed"
@@ -436,20 +601,24 @@ const AddOpportunity = () => {
               </div>
             </div>
 
-            {/* SUBMIT BUTTON (With Security Conditions) */}
+            {/* SUBMIT BUTTON (With Security & Limit Conditions) */}
             <button
               type="submit"
-              disabled={loading || !startupInfo || !isVentureActive}
+              disabled={loading || !startupInfo || isFormDisabled}
               className="w-full flex items-center justify-center gap-2 py-3.5 bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/10 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer group"
             >
               {loading ? (
                 <span className="loading loading-spinner loading-sm" />
               ) : (
                 <>
-                  {isVentureActive
-                    ? "Deploy Opportunity"
-                    : `Deployment Locked (${startupInfo?.status})`}
-                  {isVentureActive && (
+                  {opportunityStats &&
+                  !opportunityStats.isPremium &&
+                  opportunityStats.remaining === 0
+                    ? "Deployment Locked (Limit Reached)"
+                    : isVentureApproved
+                      ? "Deploy Opportunity"
+                      : `Deployment Locked (${startupInfo?.status})`}
+                  {isVentureApproved && opportunityStats?.remaining !== 0 && (
                     <ArrowRight
                       size={16}
                       className="group-hover:translate-x-1 transition-transform"

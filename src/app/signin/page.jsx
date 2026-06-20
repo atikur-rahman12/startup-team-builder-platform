@@ -3,7 +3,7 @@ import SignIn from "./SignIn";
 
 export const metadata = {
   title: "Sign In | StartupForge",
-  description: "Startup Team Builder Platform",
+  description: "..........",
 };
 
 const SignInPage = () => {

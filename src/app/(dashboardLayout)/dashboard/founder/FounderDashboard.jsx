@@ -19,13 +19,12 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
+import Link from "next/link";
 
 const FounderDashboard = () => {
   const { data: session } = useSession();
 
   const userName = session?.user?.name || "Founder";
-
-  const isLimitReached = true;
 
   const stats = {
     totalOpportunities: 12,
@@ -76,6 +75,7 @@ const FounderDashboard = () => {
 
   return (
     <div className="space-y-8 animate-fadeIn">
+      {/* 1. Header Section */}
       <div className="relative p-6 sm:p-8 rounded-2xl bg-zinc-900/20 border border-zinc-800/40 backdrop-blur-md overflow-hidden">
         <div className="absolute top-0 right-0 w-62.5 h-62.5 bg-indigo-500/5 blur-[80px] rounded-full pointer-events-none" />
 
@@ -93,36 +93,39 @@ const FounderDashboard = () => {
         </div>
       </div>
 
-      {isLimitReached && (
-        <div className="relative p-5 rounded-2xl border border-amber-500/20 bg-linear-to-r from-amber-500/10 via-amber-500/5 to-transparent backdrop-blur-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 overflow-hidden group animate-pulse-slow">
-          <div className="absolute -left-10 -top-10 w-32 h-32 bg-amber-500/10 blur-2xl rounded-full pointer-events-none" />
+      {/* 2. Premium Upgrade Banner */}
+      <div className="relative p-6 rounded-2xl border border-indigo-500/30 bg-linear-to-r from-indigo-500/10 via-purple-500/5 to-transparent backdrop-blur-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 overflow-hidden group">
+        <div className="absolute -left-10 -top-10 w-40 h-40 bg-indigo-500/10 blur-3xl rounded-full pointer-events-none" />
+        <div className="absolute right-20 bottom-0 w-32 h-32 bg-purple-500/5 blur-3xl rounded-full pointer-events-none" />
 
-          <div className="flex items-start gap-3.5 relative z-10">
-            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 shrink-0 shadow-lg shadow-amber-500/5">
-              <Sparkles size={20} className="animate-spin-slow" />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-zinc-100 tracking-wide flex items-center gap-1.5">
-                Usage Limit Reached
-                <span className="text-[10px] bg-amber-500/20 text-amber-300 font-extrabold px-1.5 py-0.5 rounded-md uppercase tracking-wider">
-                  Action Required
-                </span>
-              </h4>
-              <p className="text-xs text-zinc-400 mt-1 max-w-2xl font-medium leading-relaxed">
-                You've reached the maximum limit of workspace metrics allowed on
-                your current free tier. Upgrade your plan to unlock unlimited
-                opportunities, detailed applicant insights, and robust tracking
-                tools.
-              </p>
-            </div>
+        <div className="flex items-start gap-4 relative z-10">
+          <div className="p-3 rounded-xl bg-linear-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 text-indigo-400 shrink-0 shadow-lg shadow-indigo-500/5 group-hover:scale-105 transition-transform duration-300">
+            <Sparkles size={22} className="animate-pulse" />
           </div>
-
-          <button className="relative z-10 shrink-0 w-full sm:w-auto px-4 py-2.5 bg-linear-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-zinc-950 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20 transition-all duration-300 transform active:scale-95 group-hover:scale-[1.02]">
-            Upgrade Plan
-            <ArrowUpRight size={14} strokeWidth={2.5} />
-          </button>
+          <div>
+            <h4 className="text-sm font-bold text-zinc-100 tracking-wide flex items-center gap-2">
+              Unlock the Full Potential of Your Incubator
+              <span className="text-[10px] bg-indigo-500/20 text-indigo-300 font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider border border-indigo-500/30">
+                PRO PLAN
+              </span>
+            </h4>
+            <p className="text-xs text-zinc-400 mt-1.5 max-w-2xl font-medium leading-relaxed">
+              Upgrade to Premium today to get advanced applicant matching
+              analytics, unlimited workspace opportunities, automated email
+              follow-ups, and exclusive deep-dive insights to help scale your
+              ecosystem efficiently.
+            </p>
+          </div>
         </div>
-      )}
+
+        <Link
+          href={"/dashboard/founder/premium-plan"}
+          className="relative z-10 shrink-0 w-full sm:w-auto px-5 py-3 bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-zinc-50 text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-xl shadow-indigo-500/20 transition-all duration-300 transform active:scale-95 group-hover:shadow-purple-500/20"
+        >
+          Upgrade to Premium
+          <ArrowUpRight size={14} strokeWidth={2.5} />
+        </Link>
+      </div>
 
       {/* 3. Overview Analytics Grid */}
       <div>

@@ -167,7 +167,6 @@ const SignUp = () => {
 
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff01_1px,transparent_1px),linear-gradient(to_bottom,#ffffff01_1px,transparent_1px)] bg-size-[32px_32px] mask-[radial-gradient(ellipse_at_center,black,transparent_75%)]" />
 
-      {/* এখানে max-w-md পরিবর্তন করে max-w-lg করা হয়েছে উইডথ বাড়ানোর জন্য */}
       <div className="w-full max-w-lg relative z-10 group my-8">
         <div className="absolute -inset-0.5 bg-linear-to-r from-violet-500 to-cyan-500 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition duration-1000 group-hover:duration-200 pointer-events-none" />
 
