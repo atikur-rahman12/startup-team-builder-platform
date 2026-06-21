@@ -34,8 +34,6 @@ import {
 import { useSession } from "@/lib/auth-client";
 import Image from "next/image";
 
-const STATIC_ADMIN_STATUS = "Approved";
-
 const StartupPage = () => {
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
@@ -319,13 +317,14 @@ const StartupPage = () => {
                   </h2>
 
                   {/* 🆕 DYNAMIC BADGE SYSTEM BASED ON STATIC STATUS */}
-                  {STATIC_ADMIN_STATUS === "Approved" && (
+                  {existingStartup?.status?.toLowerCase() === "approved" && (
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-sm animate-fadeIn">
                       <ShieldCheck size={12} />
                       Approved
                     </span>
                   )}
-                  {STATIC_ADMIN_STATUS === "Pending" && (
+
+                  {existingStartup?.status?.toLowerCase() === "pending" && (
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-amber-500/10 border border-amber-500/20 text-amber-400 shadow-sm animate-pulse">
                       <Clock
                         size={12}
@@ -334,7 +333,8 @@ const StartupPage = () => {
                       Pending Approval
                     </span>
                   )}
-                  {STATIC_ADMIN_STATUS === "Rejected" && (
+
+                  {existingStartup?.status?.toLowerCase() === "rejected" && (
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-rose-500/10 border border-rose-500/20 text-rose-400 shadow-sm animate-fadeIn">
                       <XOctagon size={12} />
                       Rejected
@@ -424,40 +424,44 @@ const StartupPage = () => {
               </span>
             </div>
 
-            {/* 🆕 PREMIUM DYNAMIC DESCRIPTION VIEW */}
+            {/* PREMIUM DYNAMIC DESCRIPTION VIEW */}
             <div className="relative group/pitch">
-              {STATIC_ADMIN_STATUS === "Approved" ? (
+              {existingStartup?.status?.toLowerCase() === "approved" ? (
                 <>
-                  {/* 🟩 Approved View (Original Pitch) */}
+                  {/*  Approved View */}
                   <div className="absolute -inset-px bg-linear-to-r from-indigo-500/10 to-transparent rounded-2xl opacity-0 group-hover/pitch:opacity-100 transition-opacity duration-300 pointer-events-none" />
                   <div className="p-5 sm:p-6 bg-zinc-900/20 border border-zinc-800/60 rounded-2xl text-sm sm:text-base text-zinc-300 leading-relaxed font-normal shadow-inner animate-fadeIn">
                     {existingStartup.description}
                   </div>
                 </>
-              ) : STATIC_ADMIN_STATUS === "Pending" ? (
+              ) : existingStartup?.status?.toLowerCase() === "pending" ? (
                 <>
-                  {/* 🟨 Pending View (Premium Glassmorphism Locked Msg) */}
+                  {/*  Pending View */}
                   <div className="absolute -inset-px bg-linear-to-r from-amber-500/10 to-transparent rounded-2xl pointer-events-none" />
                   <div className="p-6 bg-zinc-900/10 border border-amber-500/20 rounded-2xl text-zinc-300 leading-relaxed font-normal shadow-2xl relative overflow-hidden backdrop-blur-xs flex flex-col sm:flex-row items-center sm:items-start gap-4 animate-fadeIn">
                     <div className="absolute top-0 right-0 p-8 text-amber-500/5 pointer-events-none">
                       <Lock size={120} />
                     </div>
+
                     <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400 shrink-0">
                       <Clock
                         size={20}
                         className="animate-spin [animation-duration:4s]"
                       />
                     </div>
+
                     <div className="space-y-2 text-center sm:text-left">
                       <h4 className="text-sm font-bold text-amber-400/90 tracking-wide uppercase">
                         Core Abstract Locked — Review In Progress
                       </h4>
+
                       <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-2xl">
                         Your venture core configuration has been successfully
                         encrypted and routed to the StartupForge Review Board.
                         Until the verification cycle completes, your public
                         abstract remains securely hidden from ecosystem nodes.
                       </p>
+
                       <div className="inline-flex items-center gap-1.5 pt-1 text-[11px] font-semibold text-zinc-500 tracking-wider uppercase">
                         <span className="size-1.5 rounded-full bg-amber-500 animate-ping" />
                         Awaiting Admin Validation Signature
@@ -467,16 +471,18 @@ const StartupPage = () => {
                 </>
               ) : (
                 <>
-                  {/* 🟥 Rejected View (Premium Error/Rejected Msg) */}
+                  {/* Rejected View */}
                   <div className="absolute -inset-px bg-linear-to-r from-rose-500/10 to-transparent rounded-2xl pointer-events-none" />
                   <div className="p-6 bg-zinc-900/10 border border-rose-500/20 rounded-2xl text-zinc-300 leading-relaxed font-normal shadow-2xl relative overflow-hidden backdrop-blur-xs flex flex-col sm:flex-row items-center sm:items-start gap-4 animate-fadeIn">
                     <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 shrink-0">
                       <XOctagon size={20} />
                     </div>
+
                     <div className="space-y-2 text-center sm:text-left">
                       <h4 className="text-sm font-bold text-rose-400/90 tracking-wide uppercase">
                         Venture Verification Rejected
                       </h4>
+
                       <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-2xl">
                         The StartupForge validation board was unable to
                         authorize your current venture profile parameters.

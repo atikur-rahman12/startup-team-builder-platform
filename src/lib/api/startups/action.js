@@ -175,3 +175,19 @@ export const getOpportunitiesByStartupId = async (startupId) => {
     return [];
   }
 };
+
+// Get All Opportunities
+export const getAllOpportunities = async () => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/opportunities`,
+      { cache: "no-store" }, // রিয়েল-টাইম ডেটার জন্য ক্যাশ অফ রাখা হয়েছে
+    );
+
+    if (!response.ok) return [];
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching all opportunities:", error);
+    return [];
+  }
+};

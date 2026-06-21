@@ -77,7 +77,7 @@ export default async function StartupOpportunitiesPage({ params }) {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {opportunities.map((opp) => (
               <div
                 key={opp._id.toString()}

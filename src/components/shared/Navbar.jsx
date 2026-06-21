@@ -87,7 +87,7 @@ const Navbar = () => {
     },
     {
       name: "Browse Opportunities",
-      href: "/opportunities",
+      href: "/browse-opportunities",
       icon: <Briefcase size={16} />,
     },
   ];
