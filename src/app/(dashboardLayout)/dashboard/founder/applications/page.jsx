@@ -1,9 +1,10 @@
 import React from 'react';
+import Applications from './Applications';
 
 const ApplicationsPage = () => {
     return (
         <div>
-            <h1>All Applications are Here....</h1>
+            <Applications />
         </div>
     );
 };

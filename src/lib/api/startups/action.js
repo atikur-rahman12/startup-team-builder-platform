@@ -191,3 +191,36 @@ export const getAllOpportunities = async () => {
     return [];
   }
 };
+
+// Get Founder Application
+export const getFounderApplications = async (email) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/founder/applications/${email}`,
+      { cache: "no-store" },
+    );
+    if (!response.ok) return [];
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching applications:", error);
+    return [];
+  }
+};
+
+// 🆕 আপডেট অ্যাপ্লিকেশন স্টেটাস (Accept/Reject)
+export const updateApplicationStatus = async (id, status) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/application/status/${id}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      },
+    );
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating application status:", error);
+    return { success: false, message: "Network error occurred" };
+  }
+};
