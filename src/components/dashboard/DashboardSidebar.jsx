@@ -64,12 +64,12 @@ const DashboardSidebar = ({ children }) => {
     {
       name: "My Applications",
       icon: <FileText size={18} />,
-      href: "/dashboard/applications",
+      href: "/dashboard/collaborator/my-applications",
     },
     {
       name: "Profile",
       icon: <UserCircle size={18} />,
-      href: "/dashboard/profile",
+      href: "/dashboard/collaborator/profile",
     },
   ];
 

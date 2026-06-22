@@ -224,3 +224,21 @@ export const updateApplicationStatus = async (id, status) => {
     return { success: false, message: "Network error occurred" };
   }
 };
+
+// Get Applicant's Own Applications
+export const getUserApplications = async (email) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/user/applications/${email}`,
+      {
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok) return [];
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};

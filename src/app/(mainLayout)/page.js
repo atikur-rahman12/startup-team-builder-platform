@@ -7,7 +7,8 @@ export default function Home() {
     <div>
       <Hero />
 
-
+      
+      
       <Statistics />
       <WhyJoin />
     </div>
