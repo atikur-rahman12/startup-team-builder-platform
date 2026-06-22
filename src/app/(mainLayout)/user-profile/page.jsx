@@ -1,7 +1,7 @@
 import UserProfile from '@/components/UserProfile';
 import React from 'react';
 
-const page = () => {
+const UserProfilePage = () => {
     return (
         <div>
             <UserProfile />
@@ -9,4 +9,4 @@ const page = () => {
     );
 };
 
-export default page;
+export default UserProfilePage;

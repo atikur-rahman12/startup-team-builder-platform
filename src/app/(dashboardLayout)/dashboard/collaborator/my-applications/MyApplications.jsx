@@ -86,7 +86,7 @@ export default function MyApplications() {
 
   return (
     <div className="relative min-h-screen w-full py-12 px-6">
-      <div className="w-full space-y-10">
+      <div className="w-full space-y-5">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/5 pb-8">
           <div>

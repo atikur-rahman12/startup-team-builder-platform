@@ -99,7 +99,7 @@ const Navbar = () => {
 
   const authLinks = [
     { name: "Dashboard", href: dashboardHref, icon: <Compass size={16} /> },
-    { name: "Profile", href: "/profile", icon: <User size={16} /> },
+    { name: "Profile", href: "/user-profile", icon: <User size={16} /> },
   ];
 
   const getLinkClass = (path) => {
