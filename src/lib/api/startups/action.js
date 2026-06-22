@@ -242,3 +242,4 @@ export const getUserApplications = async (email) => {
     return [];
   }
 };
+

@@ -2,9 +2,8 @@ import { ArrowRight, Crown, Loader2 } from "lucide-react";
 import { stripe } from "@/lib/stripe";
 
 import Link from "next/link";
-import PaymentSuccessToast from "@/components/PaymentSuccessToast";
-import { upgradeToPremium } from "@/lib/api/startups/action";
-import { Toaster } from "react-hot-toast";
+
+import { serverMutation, upgradeToPremium } from "@/lib/api/startups/action";
 
 export default async function Success({ searchParams }) {
   const { session_id } = await searchParams;
@@ -13,28 +12,29 @@ export default async function Success({ searchParams }) {
     throw new Error("Please provide a valid session_id (`cs_test_...`)");
 
   const session = await stripe.checkout.sessions.retrieve(session_id, {
-    expand: ["line_items", "payment_intent"],
+    expand: ["invoice"],
   });
+
+  console.log("Session Data", session);
 
   if (session.payment_status === "paid") {
     await upgradeToPremium(session.customer_email);
+
+    await serverMutation({
+      path: "api/payments",
+      method: "POST",
+      data: {
+        user_email: session.customer_email,
+        amount: session.amount_total / 100,
+        transaction_id: session.subscription,
+        payment_status: session.payment_status,
+        paid_at: new Date(),
+      },
+    });
   }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-900 via-indigo-950 to-slate-900 flex items-center justify-center p-4 antialiased">
-      {/* 👇 ADD TOASTER HERE */}
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          style: {
-            background: "#0f172a",
-            color: "#fff",
-            border: "1px solid rgba(255,255,255,0.1)",
-          },
-        }}
-      />
-      <PaymentSuccessToast />
-
       {/* Main Card */}
       <div className="relative w-full max-w-md bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl text-center overflow-hidden animate-fade-in">
         {/* Glow Effect Background */}

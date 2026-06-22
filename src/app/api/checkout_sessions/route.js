@@ -23,6 +23,12 @@ export async function POST() {
 
     const session = await stripe.checkout.sessions.create({
       customer_email: founderEmail,
+
+      metadata: {
+        userEmail: founderEmail,
+        userId: sessionData.user.id,
+      },
+
       line_items: [
         {
           price: process.env.STRIPE_PRICE_ID,
@@ -30,6 +36,7 @@ export async function POST() {
         },
       ],
       mode: "subscription",
+
       success_url: `${origin}/dashboard/founder/premium-plan/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/dashboard/founder`,
     });
