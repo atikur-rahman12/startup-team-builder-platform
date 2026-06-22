@@ -112,7 +112,7 @@ const DashboardSidebar = ({ children }) => {
       await signOut({
         fetchOptions: {
           onSuccess: () => {
-            router.push("/");
+            router.push("/signin");
           },
         },
       });

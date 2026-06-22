@@ -78,10 +78,13 @@ const Navbar = () => {
     }
   };
 
-  const dashboardHref =
-    currentUser?.role === "collaborator"
-      ? "/dashboard/collaborator"
-      : "/dashboard/founder";
+  const dashboardMap = {
+    collaborator: "/dashboard/collaborator",
+    founder: "/dashboard/founder",
+    admin: "/dashboard/admin",
+  };
+
+  const dashboardHref = dashboardMap[currentUser?.role] || "/dashboard";
 
   const publicLinks = [
     { name: "Home", href: "/", icon: <Home size={16} /> },
