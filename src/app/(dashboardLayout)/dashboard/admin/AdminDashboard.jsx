@@ -9,40 +9,59 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react";
-
-const stats = [
-  {
-    title: "Total Users",
-    value: "12,450",
-    icon: Users,
-    color: "bg-indigo-600",
-    bgGradient: "from-indigo-500/10 to-transparent",
-    borderColor: "border-indigo-500/20",
-  },
-  {
-    title: "Total Startups",
-    value: "3,280",
-    icon: Rocket,
-    bgGradient: "from-violet-500/10 to-transparent",
-    borderColor: "border-violet-500/20",
-  },
-  {
-    title: "Total Opportunities",
-    value: "8,940",
-    icon: Briefcase,
-    bgGradient: "from-indigo-500/10 to-transparent",
-    borderColor: "border-indigo-500/20",
-  },
-  {
-    title: "Total Revenue",
-    value: "$245,900",
-    icon: DollarSign,
-    bgGradient: "from-violet-500/10 to-transparent",
-    borderColor: "border-violet-500/20",
-  },
-];
+import { useEffect, useState } from "react";
+import { getAdminStats } from "@/lib/api/startups/action";
 
 export default function AdminOverviewPage() {
+  const [stats, setStats] = useState([]);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      const data = await getAdminStats();
+
+      console.log("Admin Stats:", data);
+
+      if (!data) return;
+
+      setStats([
+        {
+          title: "Total Users",
+          value: data.totalUsers.toLocaleString(),
+          icon: Users,
+          color: "bg-indigo-600",
+          bgGradient: "from-indigo-500/10 to-transparent",
+          borderColor: "border-indigo-500/20",
+        },
+        {
+          title: "Total Startups",
+          value: data.totalStartups.toLocaleString(),
+          icon: Rocket,
+          color: "bg-violet-600",
+          bgGradient: "from-violet-500/10 to-transparent",
+          borderColor: "border-violet-500/20",
+        },
+        {
+          title: "Total Opportunities",
+          value: data.totalOpportunities.toLocaleString(),
+          icon: Briefcase,
+          color: "bg-indigo-600",
+          bgGradient: "from-indigo-500/10 to-transparent",
+          borderColor: "border-indigo-500/20",
+        },
+        {
+          title: "Total Revenue",
+          value: `$${data.totalRevenue.toLocaleString()}`,
+          icon: DollarSign,
+          color: "bg-emerald-600",
+          bgGradient: "from-violet-500/10 to-transparent",
+          borderColor: "border-violet-500/20",
+        },
+      ]);
+    };
+
+    loadStats();
+  }, []);
+
   return (
     <div className="min-h-screen  text-white p-6 md:p-10">
       <div>

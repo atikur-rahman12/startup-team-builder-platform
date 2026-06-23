@@ -325,3 +325,22 @@ export const getAllTransactions = async () => {
     return [];
   }
 };
+
+// Get Admin Dashboard Stats
+export const getAdminStats = async () => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/admin/stats`,
+      {
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok) return null;
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching admin stats:", error);
+    return null;
+  }
+};
