@@ -277,3 +277,32 @@ export const toggleUserBlock = async (id, isBlocked) => {
 
   return await res.json();
 };
+
+// Get all startups (ADMIN)
+export const getAllStartups = async () => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/startups`, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+
+// Approve / Reject startup
+export const updateStartupStatus = async (id, status) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/startup/status/${id}`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    },
+  );
+
+  return await res.json();
+};

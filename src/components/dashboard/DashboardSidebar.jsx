@@ -87,7 +87,7 @@ const DashboardSidebar = ({ children }) => {
     {
       name: "Manage Startups",
       icon: <Rocket size={18} />,
-      href: "/dashboard/startups",
+      href: "/dashboard/admin/manage-startups",
     },
     {
       name: "Transactions",
