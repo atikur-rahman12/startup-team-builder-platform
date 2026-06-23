@@ -306,3 +306,22 @@ export const updateStartupStatus = async (id, status) => {
 
   return await res.json();
 };
+
+// Get All Transactions
+export const getAllTransactions = async () => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/payments`,
+      {
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok) return [];
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching transactions:", error);
+    return [];
+  }
+};

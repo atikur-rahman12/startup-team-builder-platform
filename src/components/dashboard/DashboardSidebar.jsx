@@ -92,7 +92,7 @@ const DashboardSidebar = ({ children }) => {
     {
       name: "Transactions",
       icon: <CreditCard size={18} />,
-      href: "/dashboard/transactions",
+      href: "/dashboard/admin/transactions",
     },
   ];
 
