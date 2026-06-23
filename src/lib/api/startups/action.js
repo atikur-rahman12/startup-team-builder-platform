@@ -243,3 +243,37 @@ export const getUserApplications = async (email) => {
   }
 };
 
+// Get All Users
+export const getAllUsers = async () => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
+      {
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok) return [];
+
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+
+// Block and Unblock user
+export const toggleUserBlock = async (id, isBlocked) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/users/block/${id}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ isBlocked }),
+    },
+  );
+
+  return await res.json();
+};

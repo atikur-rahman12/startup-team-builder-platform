@@ -82,7 +82,7 @@ const DashboardSidebar = ({ children }) => {
     {
       name: "Manage Users",
       icon: <Users size={18} />,
-      href: "/dashboard/users",
+      href: "/dashboard/admin/manage-users",
     },
     {
       name: "Manage Startups",

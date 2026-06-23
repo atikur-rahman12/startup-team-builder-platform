@@ -102,15 +102,13 @@ export default function AdminOverviewPage() {
 
       {/* Bottom Section */}
       <div className="mt-10 ">
-        <div className="lg:col-span-2 rounded-2xl bg-slate-900 border border-slate-800 p-6">
+        <div className="lg:col-span-2 rounded-2xl border border-violet-500/20 bg-zinc-900/20 bg-linear-to-br from-violet-500/10 via-indigo-500/10 to-transparent p-6">
           <h3 className="font-semibold text-lg mb-4">Platform Growth</h3>
 
           <div className="h-64 flex items-center justify-center text-slate-500">
             <StatsPieChart stats={stats} />
           </div>
         </div>
-
-        
       </div>
     </div>
   );
