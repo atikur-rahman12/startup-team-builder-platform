@@ -16,6 +16,7 @@ import {
   UserCircle,
   Users,
   CreditCard,
+  User,
 } from "lucide-react";
 import { signOut, useSession } from "@/lib/auth-client";
 import Image from "next/image";
@@ -26,6 +27,15 @@ const DashboardSidebar = ({ children }) => {
   const { data: session } = useSession();
 
   const currentUser = session?.user;
+
+  const getInitials = (name = "") => {
+    const parts = name.trim().split(" ");
+
+    const first = parts[0]?.[0] || "";
+    const second = parts[1]?.[0] || "";
+
+    return (first + second).toUpperCase() || "U";
+  };
 
   const founderMenu = [
     {
@@ -160,21 +170,42 @@ const DashboardSidebar = ({ children }) => {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              className="p-2 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 border border-transparent hover:border-zinc-800/40 rounded-xl transition-all duration-200"
-              title="Go to Homepage"
-            >
-              <Home size={18} />
-            </Link>
+            {/* Home Icon with Tooltip */}
+            <div className="relative group">
+              <Link
+                href="/"
+                className="p-2 flex text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 border border-transparent hover:border-zinc-800/40 rounded-xl transition-all duration-200"
+              >
+                <Home size={18} />
+              </Link>
+              <span className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1 text-xs font-medium text-zinc-200 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none whitespace-nowrap z-50">
+                Home
+              </span>
+            </div>
 
-            <button
-              className="p-2 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 border border-transparent hover:border-zinc-800/40 rounded-xl transition-all duration-200 relative cursor-pointer"
-              title="Notifications"
-            >
-              <Bell size={18} />
-              <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-indigo-500 ring-4 ring-[#09090b]"></span>
-            </button>
+            {/* Bell Icon with Tooltip */}
+            <div className="relative group">
+              <button className="p-2 flex text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 border border-transparent hover:border-zinc-800/40 rounded-xl transition-all duration-200 relative cursor-pointer">
+                <Bell size={18} />
+                <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-indigo-500 ring-4 ring-[#09090b]"></span>
+              </button>
+              <span className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1 text-xs font-medium text-zinc-200 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none whitespace-nowrap z-50">
+                Notifications
+              </span>
+            </div>
+
+            {/* User Icon with Tooltip */}
+            <div className="relative group">
+              <Link
+                href="/user-profile"
+                className="p-2 flex text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 border border-transparent hover:border-zinc-800/40 rounded-xl transition-all duration-200"
+              >
+                <User size={18} />
+              </Link>
+              <span className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1 text-xs font-medium text-zinc-200 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none whitespace-nowrap z-50">
+                Profile
+              </span>
+            </div>
 
             <div className="flex items-center gap-2 text-zinc-400 text-xs font-semibold tracking-widest uppercase bg-zinc-900/60 border border-zinc-800/50 px-3 py-1.5 rounded-full shadow-inner">
               <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -269,14 +300,20 @@ const DashboardSidebar = ({ children }) => {
             {currentUser ? (
               <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-zinc-900/30 border border-zinc-800/20 animate-fadeIn">
                 <div className="relative shrink-0">
-                  <Image
-                    src={currentUser.image || "/avatar-fallback.png"}
-                    alt={currentUser.name || "User"}
-                    height={36}
-                    width={36}
-                    className="h-9 w-9 rounded-xl border border-zinc-700/50 object-cover shadow-sm"
-                    unoptimized
-                  />
+                  {currentUser?.image ? (
+                    <Image
+                      src={currentUser.image}
+                      alt={currentUser.name || "User"}
+                      height={36}
+                      width={36}
+                      className="h-9 w-9 rounded-xl border border-zinc-700/50 object-cover shadow-sm"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="h-9 w-9 rounded-xl border border-zinc-700/50 bg-indigo-500/10 flex items-center justify-center text-indigo-300 text-xs font-bold uppercase">
+                      {getInitials(currentUser?.name)}
+                    </div>
+                  )}
                   <span className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full bg-emerald-500 border-2 border-[#0d0d0e]"></span>
                 </div>
                 <div className="min-w-0 flex-1">

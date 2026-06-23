@@ -120,21 +120,21 @@ export default function Applications() {
                     {/* Status Badges */}
                     <span
                       className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold capitalize ${
-                        app.status === "approved" || app.status === "Accept"
+                        app.status === "accepted" || app.status === "Accept"
                           ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"
                           : app.status === "rejected" || app.status === "Reject"
                             ? "bg-rose-500/10 border border-rose-500/20 text-rose-400"
                             : "bg-amber-500/10 border border-amber-500/20 text-amber-400"
                       }`}
                     >
-                      {app.status === "approved" ? (
+                      {app.status === "accepted" ? (
                         <CheckCircle2 size={12} />
                       ) : app.status === "rejected" ? (
                         <XCircle size={12} />
                       ) : (
                         <Clock size={12} />
                       )}
-                      {app.status === "approved"
+                      {app.status === "accepted"
                         ? "Accepted"
                         : app.status === "rejected"
                           ? "Rejected"
@@ -214,20 +214,20 @@ export default function Applications() {
                 </div>
 
                 {/* Right Block: Action Buttons (Accept / Reject) */}
-                <div className="flex lg:flex-col sm:flex-row flex-col gap-3 min-w-[140px] w-full lg:w-auto border-t lg:border-t-0 border-white/5 pt-4 lg:pt-0">
+                <div className="flex lg:flex-col sm:flex-row flex-col gap-3 min-w-35 w-full lg:w-auto border-t lg:border-t-0 border-white/5 pt-4 lg:pt-0">
                   <button
                     disabled={
-                      updatingId === app._id || app.status === "approved"
+                      updatingId === app._id || app.status === "accepted"
                     }
-                    onClick={() => handleStatusChange(app._id, "approved")}
+                    onClick={() => handleStatusChange(app._id, "accepted")}
                     className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                      app.status === "approved"
+                      app.status === "accepted"
                         ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 cursor-not-allowed"
                         : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-950/20 disabled:opacity-50"
                     }`}
                   >
                     <CheckCircle2 size={16} />
-                    {app.status === "approved" ? "Accepted" : "Accept"}
+                    {app.status === "accepted" ? "Accepted" : "Accept"}
                   </button>
 
                   <button

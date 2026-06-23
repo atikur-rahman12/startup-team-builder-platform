@@ -326,6 +326,25 @@ export const getAllTransactions = async () => {
   }
 };
 
+// Get Founder Dashboard Stats
+export const getFounderDashboardStats = async (email) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/founder/dashboard/${email}`,
+      {
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok) return null;
+
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
 // Get Admin Dashboard Stats
 export const getAdminStats = async () => {
   try {

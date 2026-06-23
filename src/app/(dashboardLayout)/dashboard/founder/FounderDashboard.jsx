@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import {
   FolderKanban,
   FileText,
@@ -20,6 +19,8 @@ import {
   CartesianGrid,
 } from "recharts";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { getFounderDashboardStats } from "@/lib/api/startups/action";
 
 const FounderDashboard = () => {
   const { data: session } = useSession();
@@ -27,50 +28,63 @@ const FounderDashboard = () => {
 
   const userName = session?.user?.name || "Founder";
 
-  const stats = {
-    totalOpportunities: 12,
-    totalApplications: 48,
-    acceptedMembers: 16,
-  };
+  const [stats, setStats] = useState({
+    totalOpportunities: 0,
+    totalApplications: 0,
+    acceptedApplications: 0,
+  });
 
-  const chartData = [
-    { month: "Jan", Opportunities: 4, Applications: 10, Accepted: 2 },
-    { month: "Feb", Opportunities: 6, Applications: 18, Accepted: 5 },
-    { month: "Mar", Opportunities: 8, Applications: 25, Accepted: 9 },
-    { month: "Apr", Opportunities: 9, Applications: 32, Accepted: 11 },
-    { month: "May", Opportunities: 11, Applications: 42, Accepted: 14 },
-    {
-      month: "Jun",
-      Opportunities: stats.totalOpportunities,
-      Applications: stats.totalApplications,
-      Accepted: stats.acceptedMembers,
-    },
-  ];
+  const [chartData, setChartData] = useState([]);
+
+  useEffect(() => {
+    const loadDashboard = async () => {
+      if (!session?.user?.email) return;
+
+      const data = await getFounderDashboardStats(session.user.email);
+
+      if (data) {
+        setStats(data.stats);
+        setChartData(data.chartData);
+      }
+    };
+
+    loadDashboard();
+  }, [session?.user?.email]);
+
+  
+  const targetCount = 25;
+  const targetPercentage = Math.min(
+    Math.round((stats.acceptedApplications / targetCount) * 100),
+    100,
+  );
 
   const cardContent = [
     {
       title: "Total Opportunities",
       value: stats.totalOpportunities,
       icon: <FolderKanban size={22} className="text-indigo-400" />,
-      badge: "+2 this week",
+      badge: stats.totalOpportunities > 0 ? "Live on site" : "No postings",
       bgGradient: "from-indigo-500/10 to-transparent",
       borderColor: "border-indigo-500/20",
+      href: "/dashboard/founder/manage-opportunities",
     },
     {
       title: "Total Applications",
       value: stats.totalApplications,
       icon: <FileText size={22} className="text-violet-400" />,
-      badge: "+14 new",
+      badge: `${stats.totalApplications} received`,
       bgGradient: "from-violet-500/10 to-transparent",
       borderColor: "border-violet-500/20",
+      href: "/dashboard/founder/applications",
     },
     {
-      title: "Accepted Members",
-      value: stats.acceptedMembers,
+      title: "Accepted Applications",
+      value: stats.acceptedApplications,
       icon: <Users size={22} className="text-emerald-400" />,
-      badge: "Target: 25",
+      badge: `${targetPercentage}% of target`,
       bgGradient: "from-emerald-500/10 to-transparent",
       borderColor: "border-emerald-500/20",
+      href: "/dashboard/founder/applications?status=accepted",
     },
   ];
 
@@ -168,7 +182,15 @@ const FounderDashboard = () => {
           {cardContent.map((card, index) => (
             <div
               key={index}
-              className={`group relative rounded-2xl border ${card.borderColor} bg-zinc-900/20 bg-linear-to-br ${card.bgGradient} p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:border-zinc-700/60 hover:bg-zinc-900/40 shadow-xs hover:shadow-indigo-500/5`}
+              className="group relative rounded-2xl border border-zinc-800/40 bg-zinc-900/20 bg-linear-to-br p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:border-zinc-700/60 hover:bg-zinc-900/40 shadow-xs hover:shadow-indigo-500/5"
+              style={{
+                borderColor:
+                  card.borderColor.split("-")[1] === "indigo"
+                    ? "rgba(99, 102, 241, 0.2)"
+                    : card.borderColor.split("-")[1] === "violet"
+                      ? "rgba(139, 92, 246, 0.2)"
+                      : "rgba(16, 185, 129, 0.2)",
+              }}
             >
               <div>
                 <div className="flex items-center justify-between">
@@ -187,13 +209,18 @@ const FounderDashboard = () => {
                 </div>
               </div>
 
-              <div className="mt-5 pt-4 border-t border-zinc-800/40 flex items-center justify-between text-[11px] font-medium text-zinc-500">
+              <div className="mt-5 pt-4 border-t border-zinc-800/40 flex items-center justify-between text-[11px] font-medium text-zinc-500 min-h-9.5">
                 <span className="bg-zinc-900/60 border border-zinc-800/40 px-2 py-0.5 rounded-md text-zinc-400">
                   {card.badge}
                 </span>
-                <span className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 text-zinc-400 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+
+            
+                <Link
+                  href={card.href}
+                  className="flex items-center gap-0.5 text-indigo-400 hover:text-indigo-300 transition-all duration-300 transform translate-x-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0"
+                >
                   View Details <ArrowUpRight size={12} />
-                </span>
+                </Link>
               </div>
             </div>
           ))}
