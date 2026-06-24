@@ -9,8 +9,8 @@ export default async function BrowseOpportunities() {
   return (
     <div className="relative min-h-screen w-full bg-slate-950 text-slate-100 py-20 overflow-hidden">
       {/* 🌌 Background Premium Radial Glows */}
-      <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-indigo-600/10 blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-[20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-violet-600/10 blur-[130px] pointer-events-none" />
+      <div className="absolute top-[-10%] left-[-10%] w-150 h-150 rounded-full bg-indigo-600/10 blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-[20%] right-[-10%] w-125 h-125 rounded-full bg-violet-600/10 blur-[130px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 space-y-16 relative z-10 w-full">
         {/* 🚀 Header Section */}

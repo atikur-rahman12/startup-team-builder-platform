@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   X,
   User,
@@ -21,11 +21,11 @@ export default function ApplyModal({
   roleTitle,
   startupName,
   opportunityId,
-  user, // e.g., user = { name: "...", email: "...", role: "founder" / "collaborator" }
+  user,
 }) {
   const [formData, setFormData] = useState({
-    fullName: user?.name || "",
-    email: user?.email || "",
+    fullName: "",
+    email: "",
     githubUrl: "",
     portfolio: "",
     resumeUrl: "",
@@ -33,9 +33,18 @@ export default function ApplyModal({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        fullName: prev.fullName || user.name || "",
+        email: prev.email || user.email || "",
+      }));
+    }
+  }, [user]);
+
   if (!isOpen) return null;
 
-  // 🔒 চেক করা হচ্ছে ইউজার আসলে ফাউন্ডার কিনা
   const isFounder = user?.role === "founder";
 
   const handleChange = (e) => {
@@ -112,18 +121,16 @@ export default function ApplyModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-8">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-slate-950/70 backdrop-blur-xl transition-opacity duration-500 ease-out"
+        className="absolute inset-0 bg-slate-950/70 backdrop-blur-xl transition-opacity duration-500 ease-out cursor-pointer"
         onClick={onClose}
       />
 
-      {/* 👑 কন্ডিশন ১: ইউজার যদি ফাউন্ডার হয় (প্রিমিয়াম ছোট রেস্ট্রিকশন মোডাল) */}
       {isFounder ? (
         <div className="relative w-full max-w-sm bg-slate-900/90 border border-rose-500/20 rounded-2xl shadow-2xl shadow-rose-500/5 p-6 overflow-hidden z-10 animate-scale-up ring-1 ring-white/5 text-center">
           {/* Ambient Glow Lights */}
           <div className="absolute -top-12 -left-12 w-32 h-32 rounded-full bg-rose-500/10 blur-2xl pointer-events-none" />
 
           <div className="flex flex-col items-center space-y-4 relative z-10">
-            {/* Premium Alert Icon */}
             <div className="p-3 rounded-2xl bg-rose-500/10 text-rose-400 border border-rose-500/20 animate-pulse">
               <ShieldAlert size={28} />
             </div>
@@ -153,7 +160,6 @@ export default function ApplyModal({
           </div>
         </div>
       ) : (
-        /* 👥 কন্ডিশন ২: ইউজার কোলাবোরেটর হলে রেগুলার ফর্ম মোডাল দেখাবে */
         <div className="relative w-full max-w-xl bg-slate-900/85 border border-white/10 rounded-2xl shadow-2xl shadow-indigo-500/5 overflow-hidden z-10 animate-scale-up ring-1 ring-white/5">
           {/* Premium Ambient Glow Lights */}
           <div className="absolute -top-16 -left-16 w-40 h-40 rounded-full bg-indigo-500/15 blur-3xl pointer-events-none" />
@@ -322,7 +328,7 @@ export default function ApplyModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full mt-2 relative inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-semibold text-white rounded-xl bg-linear-to-r from-indigo-600 via-indigo-500 to-violet-600 shadow-xl shadow-indigo-500/10 hover:shadow-indigo-500/20 hover:opacity-95 active:scale-[0.99] transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none overflow-hidden"
+              className="w-full mt-2 relative inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-semibold text-white rounded-xl bg-linear-to-r from-indigo-600 via-indigo-500 to-violet-600 shadow-xl shadow-indigo-500/10 hover:shadow-indigo-500/20 hover:opacity-95 active:scale-[0.99] transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none overflow-hidden cursor-pointer"
             >
               {isSubmitting ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

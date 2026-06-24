@@ -19,11 +19,11 @@ export default async function BrowseStartupsPage() {
 
   return (
     <div className="relative min-h-screen w-full bg-slate-950 text-slate-100 py-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] rounded-full bg-violet-600/15 blur-[80px] sm:blur-[120px] pointer-events-none animate-pulse duration-[6000ms]" />
-      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[250px] sm:w-[450px] h-[250px] sm:h-[450px] rounded-full bg-cyan-500/10 blur-[80px] sm:blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-75 sm:w-125 h-75 sm:h-125 rounded-full bg-violet-600/15 blur-[80px] sm:blur-[120px] pointer-events-none animate-pulse duration-6000" />
+      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-62.5 sm:w-112.5 h-62.5 sm:h-112.5 rounded-full bg-cyan-500/10 blur-[80px] sm:blur-[120px] pointer-events-none" />
 
       {/* ২. Subtle Grid Overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[bg-size-[4rem_4rem]] [mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
 
       <div className="max-w-7xl mx-auto space-y-16 relative z-10 w-full">
         <div className="text-center space-y-6 max-w-3xl mx-auto">
@@ -79,7 +79,7 @@ export default async function BrowseStartupsPage() {
                 className="group bg-slate-900/40 border border-white/5 hover:border-indigo-500/30 rounded-2xl p-6 sm:p-7 flex flex-col justify-between relative overflow-hidden transition-all duration-300 hover:-translate-y-1 shadow-xl shadow-black/40 backdrop-blur-md"
               >
                 {/* Hover Ambient Glow Overlay */}
-                <div className="absolute top-0 right-0 w-36 h-36 bg-indigo-600/5 blur-[40px] rounded-full pointer-events-none group-hover:bg-indigo-600/10 transition-all duration-300" />
+                <div className="absolute top-0 right-0 w-36 h-36 bg-indigo-600/5 blur-2xl rounded-full pointer-events-none group-hover:bg-indigo-600/10 transition-all duration-300" />
 
                 <div className="space-y-6">
                   {/* Card Top: Logo & Badges */}
@@ -151,13 +151,13 @@ export default async function BrowseStartupsPage() {
                     className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors"
                   >
                     <Mail size={14} className="text-slate-500" />
-                    <span className="max-w-[120px] truncate">
+                    <span className="max-w-30 truncate">
                       {startup.founderEmail}
                     </span>
                   </a>
 
                   <Link
-                    href={`/startups/${startup._id.toString()}/opportunities`}
+                    href={"/browse-opportunities"}
                   >
                     <button className="group/btn relative inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/3 hover:bg-indigo-500/10 border border-white/10 hover:border-indigo-500/30 text-slate-300 hover:text-indigo-400 font-medium tracking-wide backdrop-blur-md shadow-lg shadow-black/20 transition-all duration-300 cursor-pointer overflow-hidden">
                       <span>Explore Now</span>

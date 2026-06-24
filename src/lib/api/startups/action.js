@@ -181,7 +181,7 @@ export const getAllOpportunities = async () => {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/opportunities`,
-      { cache: "no-store" }, // রিয়েল-টাইম ডেটার জন্য ক্যাশ অফ রাখা হয়েছে
+      { cache: "no-store" },
     );
 
     if (!response.ok) return [];
@@ -189,6 +189,25 @@ export const getAllOpportunities = async () => {
   } catch (error) {
     console.error("Error fetching all opportunities:", error);
     return [];
+  }
+};
+
+// Get Single Opportunity
+export const getOpportunityById = async (id) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/opportunity/${id}`,
+      {
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok) return null;
+
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    return null;
   }
 };
 
@@ -207,7 +226,7 @@ export const getFounderApplications = async (email) => {
   }
 };
 
-// 🆕 আপডেট অ্যাপ্লিকেশন স্টেটাস (Accept/Reject)
+//  (Accept/Reject)
 export const updateApplicationStatus = async (id, status) => {
   try {
     const response = await fetch(
