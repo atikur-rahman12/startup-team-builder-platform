@@ -363,3 +363,26 @@ export const getAdminStats = async () => {
     return null;
   }
 };
+
+// Get and Read Notifications
+export const getNotifications = async (email) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications/${email}`,
+    {
+      cache: "no-store",
+    },
+  );
+
+  return await res.json();
+};
+
+export const markNotificationRead = async (id) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications/read/${id}`,
+    {
+      method: "PATCH",
+    },
+  );
+
+  return await res.json();
+};

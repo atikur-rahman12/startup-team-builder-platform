@@ -18,8 +18,8 @@ import {
 import {
   getFounderApplications,
   updateApplicationStatus,
-} from "@/lib/api/startups/action"; // সঠিক পাথ দিন
-import { useSession } from "@/lib/auth-client"; // Better-Auth ক্লায়েন্ট সেশন হুক
+} from "@/lib/api/startups/action";
+import { useSession } from "@/lib/auth-client";
 
 export default function Applications() {
   const { data: session, isPending: authPending } = useSession();
@@ -84,7 +84,7 @@ export default function Applications() {
           </div>
         </div>
 
-        {/* 🗂️ Grid / List Wrapper */}
+        {/* Grid / List Wrapper */}
         {applications.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center bg-slate-900/20 border border-white/5 p-16 rounded-3xl max-w-xl mx-auto backdrop-blur-md space-y-4 shadow-2xl">
             <div className="p-4 bg-white/5 border border-white/10 rounded-2xl text-slate-500">

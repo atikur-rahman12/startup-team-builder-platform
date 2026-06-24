@@ -1,308 +1,285 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
-  LayoutDashboard,
-  DollarSign,
-  Briefcase,
-  TrendingUp,
-  Award,
-  Bell,
-  Calendar,
-  ChevronRight,
-  ArrowUpRight,
+  FileText,
   CheckCircle2,
+  XCircle,
+  ArrowUpRight,
+  Zap,
   Clock,
   MessageSquare,
-  Users,
-  Layers,
+  Briefcase,
 } from "lucide-react";
+import Link from "next/link";
+import { useSession } from "@/lib/auth-client";
+import { useEffect, useState } from "react";
+import {
+  getAllOpportunities,
+  getUserApplications,
+} from "@/lib/api/startups/action";
 
-export default function CollaboratorDashboard() {
-  // Mock data for dashboard
-  const [stats] = useState([
+const CollaboratorDashboard = () => {
+  const { data: session, isPending } = useSession();
+  const userName = session?.user?.name || "User";
+  const [recentActivities, setRecentActivities] = useState([]);
+
+  const [stats, setStats] = useState({
+    opportunities: 0,
+    activeProjects: 0,
+    submittedApplications: 0,
+    completedTasks: 0,
+    rejected: 0,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (!session?.user?.email) return;
+
+      const email = session.user.email;
+
+      const [applications, opportunities] = await Promise.all([
+        getUserApplications(email),
+        getAllOpportunities(),
+      ]);
+
+      const submitted = applications.length;
+
+      const accepted = applications.filter(
+        (app) => app.status === "accepted",
+      ).length;
+
+      const rejected = applications.filter(
+        (app) => app.status === "rejected",
+      ).length;
+
+      setStats({
+        opportunities: opportunities.length,
+        submittedApplications: submitted,
+        activeProjects: accepted,
+        completedTasks: accepted,
+        rejected: rejected,
+      });
+
+      const activityData = applications.slice(0, 5).map((app, index) => ({
+        id: app._id || index,
+        title: `Applied for ${app.roleTitle || "Opportunity"}`,
+        time: new Date(app.appliedAt).toLocaleDateString(),
+        desc: `Application status: ${app.status}`,
+        status: app.status,
+      }));
+
+      setRecentActivities(activityData);
+    };
+
+    fetchStats();
+  }, [session]);
+
+  const targetCount = 15;
+  const targetPercentage = Math.min(
+    Math.round((stats.activeProjects / targetCount) * 100),
+    100,
+  );
+
+  const cardContent = [
     {
-      title: "Total Earnings",
-      value: "$4,250.00",
-      change: "+12.5%",
-      isPositive: true,
-      icon: DollarSign,
-      color: "text-emerald-400",
-      bgColor: "bg-emerald-500/10",
-      borderColor: "border-emerald-500/20",
+      title: "Opportunities",
+      value: stats.opportunities,
+      icon: <Briefcase size={22} className="text-white" />,
+      // Relatable text for available job posts
+      badge:
+        stats.opportunities > 0
+          ? `${stats.opportunities} positions open`
+          : "No open role",
+      color: "text-white",
+      linkColor: "text-white",
+      href: "/browse-opportunities",
     },
     {
-      title: "Active Campaigns",
-      value: "8 Roles",
-      change: "2 Pending",
-      isPositive: true,
-      icon: Briefcase,
-      color: "text-indigo-400",
-      bgColor: "bg-indigo-500/10",
-      borderColor: "border-indigo-500/20",
-    },
-    {
-      title: "Performance Score",
-      value: "98.4%",
-      change: "Top 5%",
-      isPositive: true,
-      icon: TrendingUp,
+      title: "Total Applications",
+      value: stats.submittedApplications,
+      icon: <FileText size={22} className="text-violet-400" />,
+      // Count specific info track
+      badge: `${stats.submittedApplications} roles applied`,
       color: "text-violet-400",
-      bgColor: "bg-violet-500/10",
-      borderColor: "border-violet-500/20",
+      linkColor: "text-violet-400",
+      href: "/dashboard/collaborator/my-applications?status=All",
     },
     {
-      title: "Collaborator Rank",
-      value: "Elite Tier",
-      change: "Level 4",
-      isPositive: true,
-      icon: Award,
-      color: "text-amber-400",
-      bgColor: "bg-amber-500/10",
-      borderColor: "border-amber-500/20",
-    },
-  ]);
-
-  const [recentActivities] = useState([
-    {
-      id: 1,
-      type: "milestone",
-      title: "Milestone Approved",
-      description: "Frontend Developer role milestone #2 has been verified.",
-      time: "2 hours ago",
-      icon: CheckCircle2,
-      iconColor: "text-emerald-400",
+      title: "Accepted",
+      value: stats.completedTasks,
+      icon: <CheckCircle2 size={22} className="text-emerald-400" />,
+      // Milestones tracker based on accepted apps
+      badge:
+        stats.completedTasks > 0
+          ? `${targetPercentage}% of milestone`
+          : "Waiting for approval",
+      color: "text-emerald-400",
+      linkColor: "text-emerald-400",
+      href: "/dashboard/collaborator/my-applications?status=Accepted",
     },
     {
-      id: 2,
-      type: "message",
-      title: "New Message from Founder",
-      description: "NovaTech AI founder left a comment on your submission.",
-      time: "5 hours ago",
-      icon: MessageSquare,
-      iconColor: "text-indigo-400",
+      title: "Rejected",
+      value: stats.rejected,
+      icon: <XCircle size={22} className="text-rose-500" />,
+      // Informative status tracker
+      badge:
+        stats.rejected > 0
+          ? `${stats.rejected} needs attention`
+          : "Perfect record",
+      color: "text-rose-500",
+      linkColor: "text-rose-500",
+      href: "/dashboard/collaborator/my-applications?status=Rejected",
     },
-    {
-      id: 3,
-      type: "deadline",
-      title: "Upcoming Deadline",
-      description: "Backend API Integration deliverable is due in 24 hours.",
-      time: "1 day ago",
-      icon: Clock,
-      iconColor: "text-amber-400",
-    },
-  ]);
-
-  const [activeProjects] = useState([
-    {
-      id: "p1",
-      role: "Senior Full Stack Engineer",
-      startup: "QuantumVortex Labs",
-      status: "In Progress",
-      progress: 75,
-      nextDeadline: "July 02, 2026",
-    },
-    {
-      id: "p2",
-      role: "UI/UX & Brand Designer",
-      startup: "NovaTech AI",
-      status: "Review Pending",
-      progress: 90,
-      nextDeadline: "July 05, 2026",
-    },
-  ]);
+  ];
 
   return (
-    <div className="relative min-h-screen w-full py-12 overflow-hidden">
-      {/* 🌌 Premium Ambient Background Glows */}
-      {/* <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-indigo-600/10 blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-violet-600/10 blur-[130px] pointer-events-none" /> */}
+    <div className="relative min-h-screen w-full bg-slate-950 py-2 text-white space-y-6 animate-fadeIn">
+      {/* Background Glow effects */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full space-y-10">
-        {/* 🚀 Top Heading Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/5 pb-8">
-          <div>
-            <div className="flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 px-3 py-1 rounded-full text-xs font-semibold max-w-max mb-3">
-              <LayoutDashboard size={13} /> Control Center
+      <div className="relative w-full space-y-6">
+        {/* 1. Welcome Header Banner */}
+        <div className="relative p-6 rounded-2xl bg-slate-900/40 border border-white/5 backdrop-blur-xl overflow-hidden">
+          <div className="relative z-10 flex flex-col gap-1">
+            <div className="inline-flex items-center gap-2 mb-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-slate-300 backdrop-blur-md w-fit">
+              <span className="flex h-2 w-2 rounded-full bg-indigo-500 animate-ping" />
+              <span className="bg-linear-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-semibold">
+                Collaborator Workspace
+              </span>
+              <div className="h-3 w-px bg-white/10 mx-1" />
+              <span className="text-slate-400 flex items-center gap-1">
+                StartupForge v2.0
+                <Zap size={12} className="text-amber-400 fill-current" />
+              </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-linear-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-              Collaborator Suite
+
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center gap-2.5 min-h-10">
+              Welcome Back,{" "}
+              <span className="bg-linear-to-r from-violet-400 via-indigo-200 to-cyan-400 bg-clip-text text-transparent">
+                {isPending ? "..." : userName}
+              </span>
+              <span className="inline-block origin-[70%_70%] animate-wave text-2xl sm:text-3xl">
+                👋
+              </span>
             </h1>
-            <p className="text-slate-400 text-sm sm:text-base mt-1">
-              Welcome back! Track your contributions, earnings, and startup
-              milestones.
+            <p className="text-xs sm:text-sm text-slate-400 max-w-2xl font-medium leading-relaxed mt-1">
+              Here's your collaboration workspace today. Track your project
+              contributions, manage active applications, and connect with
+              innovative startup ecosystems.
             </p>
           </div>
-
-          {/* Quick Date Badge */}
-          <div className="bg-slate-900/60 border border-white/10 px-4 py-2.5 rounded-2xl flex items-center gap-2 max-w-max backdrop-blur-md shadow-xl">
-            <Calendar size={16} className="text-indigo-400" />
-            <span className="text-sm font-semibold text-slate-300">
-              {new Date().toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </span>
-          </div>
         </div>
 
-        {/* 📊 Key Metrics Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {stats.map((stat, i) => {
-            const IconComponent = stat.icon;
-            return (
+        {/* 3. Overview Analytics Grid */}
+        <div className="space-y-3">
+          <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 px-1">
+            Overview Analytics
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {cardContent.map((card, index) => (
               <div
-                key={i}
-                className="bg-slate-900/40 border border-white/5 hover:border-indigo-500/30 transition-all duration-300 hover:-translate-y-1 rounded-2xl p-6 backdrop-blur-xl shadow-xl flex items-center justify-between group"
+                key={index}
+                className="group relative rounded-2xl border border-white/5 bg-slate-900/40 p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:border-white/10 hover:bg-slate-900/60 backdrop-blur-xl shadow-xs"
               >
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                    {stat.title}
-                  </p>
-                  <h3 className="text-2xl font-black text-white tracking-tight">
-                    {stat.value}
-                  </h3>
-                  <span
-                    className={`inline-flex items-center text-xs font-semibold ${stat.color}`}
-                  >
-                    {stat.change}
-                  </span>
-                </div>
-                <div
-                  className={`p-3 rounded-xl border ${stat.bgColor} ${stat.borderColor} group-hover:scale-110 transition-transform duration-300`}
-                >
-                  <IconComponent size={22} className={stat.color} />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* 🛠️ Main Dashboard Content Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Block: Active Tasks / Roles (Takes 2 Columns on Desktop) */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Layers size={18} className="text-indigo-400" /> Active
-                Deployments
-              </h2>
-              <button className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1">
-                View All <ChevronRight size={14} />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              {activeProjects.map((project) => (
-                <div
-                  key={project.id}
-                  className="bg-slate-900/40 border border-white/5 hover:border-indigo-500/20 transition-all duration-300 rounded-2xl p-6 backdrop-blur-xl shadow-xl space-y-4"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
-                      <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                        {project.role}
-                      </h3>
-                      <p className="text-xs text-slate-400 font-medium">
-                        Startup:{" "}
-                        <span className="text-slate-300">
-                          {project.startup}
-                        </span>
-                      </p>
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-400 tracking-wide">
+                      {card.title}
+                    </span>
+                    <div className="p-2 rounded-xl bg-slate-950/60 border border-white/5 group-hover:border-white/10 transition-all duration-300">
+                      {card.icon}
                     </div>
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 max-w-max">
-                      <Clock size={12} /> {project.status}
+                  </div>
+
+                  <div className="mt-4 flex items-baseline gap-2">
+                    <span
+                      className={`text-3xl font-black tracking-tight ${card.color || "text-white"}`}
+                    >
+                      {card.value}
                     </span>
                   </div>
-
-                  {/* Progress Bar Component */}
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-xs font-bold">
-                      <span className="text-slate-400">Milestone Progress</span>
-                      <span className="text-indigo-400">
-                        {project.progress}%
-                      </span>
-                    </div>
-                    <div className="w-full h-2 bg-slate-950 rounded-full overflow-hidden p-[2px] border border-white/5">
-                      <div
-                        className="h-full bg-linear-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-500"
-                        style={{ width: `${project.progress}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Footer Meta info */}
-                  <div className="flex items-center justify-between pt-2 border-t border-white/5 text-xs text-slate-500 font-medium">
-                    <div>
-                      Next Deadline:{" "}
-                      <span className="text-slate-400">
-                        {project.nextDeadline}
-                      </span>
-                    </div>
-                    <button className="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 font-bold transition-all hover:gap-1.5">
-                      Workspace <ArrowUpRight size={14} />
-                    </button>
-                  </div>
                 </div>
-              ))}
+
+                <div className="mt-5 pt-4 border-t border-white/5 flex items-center justify-between text-[11px] font-medium text-slate-500 min-h-9.5">
+                  <span className="bg-slate-950/60 border border-white/5 px-2 py-0.5 rounded-md text-slate-400">
+                    {card.badge}
+                  </span>
+
+                  <Link
+                    href={card.href}
+                    className={`flex items-center gap-0.5 ${card.linkColor} hover:opacity-80 transition-all duration-300 transform translate-x-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 font-bold`}
+                  >
+                    View Details <ArrowUpRight size={12} />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 4. Recent Activity Log */}
+        <div className="p-6 rounded-2xl bg-slate-900/40 border border-white/5 backdrop-blur-xl relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-500">
+                <Zap size={14} className="text-indigo-400" />
+                Activity Stream
+              </div>
+              <h3 className="text-base font-bold text-slate-200 mt-1">
+                Recent Updates & Progress
+              </h3>
             </div>
           </div>
 
-          {/* Right Block: Live Activity Feed */}
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Bell size={18} className="text-violet-400" /> Activity Stream
-              </h2>
-            </div>
+          {/* Activity List */}
+          <div className="space-y-4">
+            {recentActivities.length > 0 ? (
+              recentActivities.map((activity) => (
+                <div
+                  key={activity.id}
+                  className="flex items-start gap-4 p-4 rounded-xl border border-white/5 bg-slate-950/40 hover:border-white/10 transition-all duration-200"
+                >
+                  <div className="p-2 rounded-lg bg-slate-900/60 border border-white/5 shrink-0">
+                    {activity.status === "accepted" ? (
+                      <CheckCircle2 size={14} className="text-emerald-400" />
+                    ) : activity.status === "rejected" ? (
+                      <XCircle size={14} className="text-rose-500" />
+                    ) : (
+                      <Clock size={14} className="text-amber-400" />
+                    )}
+                  </div>
 
-            <div className="bg-slate-900/40 border border-white/5 rounded-2xl p-6 backdrop-blur-xl shadow-xl space-y-6">
-              {recentActivities.map((activity) => {
-                const ActivityIcon = activity.icon;
-                return (
-                  <div
-                    key={activity.id}
-                    className="flex gap-4 items-start last:border-b-0 border-b border-white/5 pb-4 last:pb-0"
-                  >
-                    <div
-                      className={`p-2 rounded-xl bg-white/5 border border-white/10 mt-0.5 ${activity.iconColor}`}
-                    >
-                      <ActivityIcon size={16} />
-                    </div>
-                    <div className="space-y-1 flex-1">
-                      <h4 className="text-sm font-bold text-slate-200">
+                  <div className="flex-1 space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <h4 className="text-sm font-semibold text-slate-200">
                         {activity.title}
                       </h4>
-                      <p className="text-xs text-slate-400 leading-relaxed font-normal">
-                        {activity.description}
-                      </p>
-                      <span className="block text-[10px] text-slate-500 font-semibold tracking-wide">
+
+                      <span className="text-[10px] font-medium text-slate-500 flex items-center gap-1 shrink-0">
+                        <Clock size={10} />
                         {activity.time}
                       </span>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
 
-            {/* Quick Stats Support Box */}
-            <div className="bg-linear-to-br from-indigo-600/10 to-violet-600/10 border border-indigo-500/20 rounded-2xl p-5 flex items-center justify-between gap-4 group">
-              <div className="space-y-1">
-                <h4 className="text-sm font-bold text-white">
-                  Need Technical Help?
-                </h4>
-                <p className="text-xs text-slate-400">
-                  Connect instantly with the core engineering system.
-                </p>
+                    <p className="text-xs text-slate-400 font-medium">
+                      {activity.desc}
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-10 text-slate-500">
+                No recent activity found
               </div>
-              <button className="p-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-lg shadow-indigo-950/50 transition-all active:scale-95 shrink-0">
-                <Users size={16} />
-              </button>
-            </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default CollaboratorDashboard;
