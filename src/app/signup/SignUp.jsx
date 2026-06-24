@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { signUp, signOut } from "@/lib/auth-client";
+import { signUp, signOut, authClient } from "@/lib/auth-client";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import {
@@ -150,14 +150,9 @@ const SignUp = () => {
   };
 
   const handleGoogleSignUp = async () => {
-    setIsGoogleLoading(true);
-    try {
-      console.log("Google Sign Up Initiated (Role):", role);
-    } catch (error) {
-      console.error("Google Auth Error:", error);
-    } finally {
-      setIsGoogleLoading(false);
-    }
+    await authClient.signIn.social({
+      provider: "google",
+    });
   };
 
   return (
@@ -191,6 +186,7 @@ const SignUp = () => {
 
           <div className="mb-5">
             <button
+              onClick={handleGoogleSignUp}
               type="button"
               className="w-full h-12 flex items-center justify-center gap-3 bg-white/3 hover:bg-white/6 border border-white/5 hover:border-white/10 text-slate-200 font-medium rounded-xl transition-all duration-300 transform active:scale-[0.98] cursor-pointer shadow-lg relative group/btn overflow-hidden"
             >

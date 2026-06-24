@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Mail, Lock, ArrowRight, Eye, EyeOff, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "@/lib/auth-client";
+import { authClient, signIn } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 
 const SignIn = () => {
@@ -48,6 +48,12 @@ const SignIn = () => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+    });
+  };
+
   return (
     <div className="min-h-screen w-full bg-slate-950 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative overflow-hidden selection:bg-violet-500/30 selection:text-white">
       <div className="absolute top-[-10%] left-[-10%] w-125 h-125 bg-violet-600/10 blur-[150px] rounded-full pointer-events-none animate-pulse duration-6000" />
@@ -78,6 +84,7 @@ const SignIn = () => {
           </div>
 
           <button
+            onClick={handleGoogleSignIn}
             type="button"
             className="w-full h-12 flex items-center justify-center gap-3 bg-white/3 hover:bg-white/6 border border-white/5 hover:border-white/10 text-slate-200 font-medium rounded-xl transition-all duration-300 transform active:scale-[0.98] cursor-pointer shadow-lg relative group/btn overflow-hidden"
           >
