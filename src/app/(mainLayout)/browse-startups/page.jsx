@@ -1,5 +1,7 @@
-import React from 'react';
-import BrowseStartups from './BrowseStartups';
+export const dynamic = "force-dynamic";
+
+import React from "react";
+import BrowseStartups from "./BrowseStartups";
 
 const BrowseStartupPage = () => {
   return (
