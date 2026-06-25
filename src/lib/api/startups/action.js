@@ -1,24 +1,10 @@
 "use server";
 
+import { getUserToken } from "@/lib/core/session";
+import { protectedFetch } from "../server";
+
 export const getStartupByEmail = async (email) => {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/startup/${email}`,
-      {
-        cache: "no-store",
-      },
-    );
-
-    if (!response.ok) return null;
-
-    const text = await response.text();
-    if (!text) return null;
-
-    return JSON.parse(text);
-  } catch (error) {
-    console.error("Error fetching startup by email:", error);
-    return null;
-  }
+  return await protectedFetch(`api/startup/${email}`);
 };
 
 export const addStartups = async (data) => {
@@ -30,16 +16,30 @@ export const addStartups = async (data) => {
   return resData;
 };
 
+export const authHeader = async () => {
+  const token = await getUserToken();
+
+  console.log("FRONTEND TOKEN:", token);
+
+  return token
+    ? {
+        authorization: `Bearer ${token}`,
+      }
+    : {};
+};
+
 export const serverMutation = async ({ path, method, data }) => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const res = await fetch(`${baseUrl}/${path}`, {
-    method: method,
+    method,
     headers: {
       "Content-Type": "application/json",
+      ...(await authHeader()),
     },
-    body: JSON.stringify(data),
+    body: data ? JSON.stringify(data) : undefined,
   });
+
   return res.json();
 };
 
@@ -79,7 +79,7 @@ export const deleteStartup = async (email) => {
   }
 };
 
-// 🆕 Add Opportunity Action
+//  Add Opportunity Action
 export const addOpportunity = async (data) => {
   const resData = await serverMutation({
     path: "api/opportunities",
@@ -89,7 +89,7 @@ export const addOpportunity = async (data) => {
   return resData;
 };
 
-// 🆕 Get Opportunities by Founder Email
+//  Get Opportunities by Founder Email
 export const getOpportunitiesByEmail = async (email) => {
   try {
     const response = await fetch(
@@ -104,7 +104,7 @@ export const getOpportunitiesByEmail = async (email) => {
   }
 };
 
-// 🆕 Update Opportunity
+//  Update Opportunity
 export const updateOpportunity = async (id, formData) => {
   try {
     const response = await fetch(
@@ -122,7 +122,7 @@ export const updateOpportunity = async (id, formData) => {
   }
 };
 
-// 🆕 Delete Opportunity
+// Delete Opportunity
 export const deleteOpportunity = async (id) => {
   try {
     const response = await fetch(
@@ -247,15 +247,7 @@ export const updateApplicationStatus = async (id, status) => {
 // Get Applicant's Own Applications
 export const getUserApplications = async (email) => {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/user/applications/${email}`,
-      {
-        cache: "no-store",
-      },
-    );
-
-    if (!response.ok) return [];
-    return await response.json();
+    return await protectedFetch(`api/user/applications/${email}`);
   } catch (error) {
     console.error(error);
     return [];
@@ -264,21 +256,7 @@ export const getUserApplications = async (email) => {
 
 // Get All Users
 export const getAllUsers = async () => {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
-      {
-        cache: "no-store",
-      },
-    );
-
-    if (!response.ok) return [];
-
-    return await response.json();
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
+  return await protectedFetch("api/users");
 };
 
 // Block and Unblock user
@@ -289,6 +267,7 @@ export const toggleUserBlock = async (id, isBlocked) => {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        ...(await authHeader()),
       },
       body: JSON.stringify({ isBlocked }),
     },
@@ -299,46 +278,22 @@ export const toggleUserBlock = async (id, isBlocked) => {
 
 // Get all startups (ADMIN)
 export const getAllStartups = async () => {
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/startups`, {
-      cache: "no-store",
-    });
-
-    if (!res.ok) return [];
-    return await res.json();
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
+  return await protectedFetch("api/startups");
 };
 
 // Approve / Reject startup
 export const updateStartupStatus = async (id, status) => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/startup/status/${id}`,
-    {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    },
-  );
-
-  return await res.json();
+  return await serverMutation({
+    path: `api/startup/status/${id}`,
+    method: "PATCH",
+    data: { status },
+  });
 };
 
 // Get All Transactions
 export const getAllTransactions = async () => {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/payments`,
-      {
-        cache: "no-store",
-      },
-    );
-
-    if (!response.ok) return [];
-
-    return await response.json();
+    return await protectedFetch("api/payments");
   } catch (error) {
     console.error("Error fetching transactions:", error);
     return [];
@@ -366,21 +321,7 @@ export const getFounderDashboardStats = async (email) => {
 
 // Get Admin Dashboard Stats
 export const getAdminStats = async () => {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/admin/stats`,
-      {
-        cache: "no-store",
-      },
-    );
-
-    if (!response.ok) return null;
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching admin stats:", error);
-    return null;
-  }
+  return await protectedFetch("api/admin/stats");
 };
 
 // Get and Read Notifications
