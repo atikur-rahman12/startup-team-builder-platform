@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Mail, ShieldCheck, Sparkles, ImagePlus, Save } from "lucide-react";
 import Image from "next/image";
 import toast from "react-hot-toast";
-import { useSession } from "@/lib/auth-client";
+import { authClient, useSession } from "@/lib/auth-client";
 
 export default function UserProfile() {
   const [imageFile, setImageFile] = useState(null);
@@ -77,10 +77,29 @@ export default function UserProfile() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Saved Data:", formData);
-    alert("Profile saved successfully!");
+
+    const { name, skills, bio } = formData;
+    const image = imageUrl;
+
+    const loadingToast = toast.loading("Updating profile...");
+
+    try {
+      await authClient.updateUser({
+        name,
+        image,
+        skills,
+        bio,
+      });
+
+      toast.success("Profile updated successfully!", { id: loadingToast });
+
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("Failed to update database fields.", { id: loadingToast });
+    }
   };
 
   const getUserInitials = (name) => {
@@ -100,7 +119,6 @@ export default function UserProfile() {
       <div className="absolute bottom-[-10%] right-[-10%] w-125 h-125 bg-cyan-500/10 blur-[150px] rounded-full" />
 
       <div className="w-full max-w-2xl relative z-10 space-y-6">
-        {/* TOP: Logged In User Info Profile Card */}
         <div className="relative group">
           <div className="absolute -inset-0.5 bg-linear-to-r from-violet-500 to-cyan-500 rounded-3xl opacity-20 blur-md transition duration-1000" />
           <div className="relative bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-3xl p-8 flex flex-col items-center text-center">
@@ -124,16 +142,24 @@ export default function UserProfile() {
             <h3 className="text-2xl font-bold text-white tracking-tight">
               {session?.user?.name || "Loading name..."}
             </h3>
-            <p className="text-sm text-slate-400 mt-0.5 mb-2">
+            <p className="text-sm text-slate-400 mt-0.5 mb-3">
               {session?.user?.email || "Loading email..."}
             </p>
-            <span className="px-4 py-1 text-xs font-semibold rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/20 uppercase tracking-wider">
+
+            <span className="px-4 py-1 mb-2 text-xs font-semibold rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/20 uppercase tracking-wider">
               {session?.user?.role || "User"}
             </span>
+
+            {session?.user?.bio && (
+              <div className="max-w-md bg-slate-950/40 border border-white/5 rounded-2xl p-4 mb-4 backdrop-blur-md">
+                <p className="text-sm text-slate-300 leading-relaxed italic">
+                  {session.user.bio}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* BOTTOM: Form Layout */}
         <div className="relative group">
           <div className="absolute -inset-0.5 bg-linear-to-r from-violet-500 to-cyan-500 rounded-3xl opacity-20 blur-md transition duration-1000" />
           <div className="relative bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-3xl p-8 sm:p-10 shadow-2xl">
@@ -158,7 +184,6 @@ export default function UserProfile() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Full Name */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-400 tracking-wide uppercase px-1 flex items-center gap-1">
                   Full Name{" "}
@@ -180,7 +205,6 @@ export default function UserProfile() {
                 </div>
               </div>
 
-              {/* Email Address */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-400 tracking-wide uppercase px-1 flex items-center gap-1">
                   Email Address{" "}
@@ -203,7 +227,6 @@ export default function UserProfile() {
                 </div>
               </div>
 
-              {/* Profile Picture */}
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center px-1">
                   <label className="text-xs font-bold text-slate-400 tracking-wide uppercase flex items-center gap-1">
@@ -244,7 +267,7 @@ export default function UserProfile() {
                         type="file"
                         accept="image/*"
                         onChange={handleImageChange}
-                        required={!imageUrl} // যদি আগে থেকে ইমেজ না থাকে তবেই রিকোয়ার্ড হবে
+                        required={!imageUrl}
                         className="hidden"
                       />
                     </label>
@@ -252,7 +275,6 @@ export default function UserProfile() {
                 </div>
               </div>
 
-              {/* Skills */}
               <div className="space-y-1.5">
                 <label className="flex items-center gap-1 text-xs font-bold text-slate-400 uppercase tracking-wide px-1">
                   Skills (comma-separated){" "}
@@ -280,9 +302,6 @@ export default function UserProfile() {
                   Bio <span className="text-red-500 font-bold text-sm">*</span>
                 </label>
                 <div className="relative group/input">
-                  <div className="absolute top-3 left-0 pl-3.5 flex items-start pointer-events-none text-slate-500 group-focus-within/input:text-violet-400 transition-colors duration-200">
-                    <Mail size={18} />
-                  </div>
                   <textarea
                     name="bio"
                     value={formData.bio}

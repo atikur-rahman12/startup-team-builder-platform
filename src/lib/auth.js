@@ -1,7 +1,7 @@
 import dns from "node:dns";
 dns.setServers(["1.1.1.1", "8.8.4.4"]);
 
-import { betterAuth } from "better-auth";
+import { betterAuth, string } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { jwt } from "better-auth/plugins";
@@ -38,6 +38,14 @@ export const auth = betterAuth({
       isPremium: {
         type: "boolean",
         defaultValue: false,
+      },
+      skills: {
+        type: "string",
+        defaultValue: "",
+      },
+      bio: {
+        type: "string",
+        defaultValue: "",
       },
     },
   },
