@@ -232,7 +232,7 @@ export default function OpportunityDetailsPage() {
                       .map((skill, index) => (
                         <span
                           key={index}
-                          className="px-3.5 py-1.5 text-xs sm:text-sm font-medium text-indigo-300 bg-indigo-500/5 border border-indigo-500/10 hover:border-indigo-500/30 hover:bg-indigo-500/10 rounded-xl transition-all duration-200"
+                          className="px-4 py-2 text-xs sm:text-sm font-medium text-indigo-300 bg-indigo-500/5 border border-indigo-500/10 hover:border-indigo-500/30 hover:bg-indigo-500/10 rounded-xl transition-all duration-200"
                         >
                           {skill.trim()}
                         </span>

@@ -177,17 +177,30 @@ export const getOpportunitiesByStartupId = async (startupId) => {
 };
 
 // Get All Opportunities
-export const getAllOpportunities = async () => {
+export const getAllOpportunities = async ({
+  search = "",
+  workType = "",
+  commitmentLevel = "",
+} = {}) => {
   try {
+    const params = new URLSearchParams();
+
+    if (search) params.append("search", search);
+    if (workType) params.append("workType", workType);
+    if (commitmentLevel) params.append("commitmentLevel", commitmentLevel);
+
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/opportunities`,
-      { cache: "no-store" },
+      `${process.env.NEXT_PUBLIC_API_URL}/api/opportunities?${params.toString()}`,
+      {
+        cache: "no-store",
+      },
     );
 
     if (!response.ok) return [];
+
     return await response.json();
-  } catch (error) {
-    console.error("Error fetching all opportunities:", error);
+  } catch (err) {
+    console.log(err);
     return [];
   }
 };
