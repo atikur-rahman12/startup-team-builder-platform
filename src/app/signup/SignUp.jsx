@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { signUp, signOut, authClient } from "@/lib/auth-client";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
@@ -19,7 +19,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 
-const SignUp = () => {
+const SignUpForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/";
@@ -520,4 +520,12 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default function SignUp() {
+  return (
+    <Suspense
+      fallback={<div className="text-white text-center mt-20">Loading...</div>}
+    >
+      <SignUpForm />
+    </Suspense>
+  );
+}

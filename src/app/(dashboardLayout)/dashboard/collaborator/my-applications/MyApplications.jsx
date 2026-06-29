@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, Suspense } from "react";
 import {
   ExternalLink,
   Clock,
@@ -13,9 +13,9 @@ import {
 } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { getUserApplications } from "@/lib/api/startups/action";
-import { useSearchParams } from "next/navigation"; // Hook added for parameter routing checks
+import { useSearchParams } from "next/navigation";
 
-export default function MyApplications() {
+function MyApplicationsContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
 
@@ -60,6 +60,8 @@ export default function MyApplications() {
   // Pagination Logic
   const totalPages = Math.ceil(filteredApplications.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
+
+  // FIXED: This variable is now correctly rendered inside the table body below
   const paginatedApplications = filteredApplications.slice(
     startIndex,
     startIndex + itemsPerPage,
@@ -170,7 +172,7 @@ export default function MyApplications() {
                 setActiveTab(tab);
                 setCurrentPage(1);
               }}
-              className={`relative px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-200 rounded-lg ${
+              className={`relative px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-200 rounded-lg cursor-pointer ${
                 activeTab === tab
                   ? "text-white bg-white/10 shadow-inner"
                   : "text-slate-400 hover:text-slate-200"
@@ -188,7 +190,7 @@ export default function MyApplications() {
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-white/5 text-xs uppercase text-slate-400">
-                    <th className="py-4 flex">Opportunity</th>
+                    <th className="py-4">Opportunity</th>
                     <th className="py-4 text-center">Startup</th>
                     <th className="py-4 text-center">Applied</th>
                     <th className="py-4 text-center">Portfolio</th>
@@ -221,6 +223,7 @@ export default function MyApplications() {
                       </td>
                     </tr>
                   ) : (
+                    /* FIXED: Now mapping over paginatedApplications instead of filteredApplications */
                     paginatedApplications.map((app) => (
                       <tr
                         key={app._id}
@@ -307,7 +310,7 @@ export default function MyApplications() {
                       setCurrentPage((prev) => Math.max(prev - 1, 1))
                     }
                     disabled={currentPage === 1}
-                    className="px-4 py-2 rounded-xl border border-white/10 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                    className="px-4 py-2 rounded-xl border border-white/10 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                   >
                     <ChevronLeft size={16} />
                   </button>
@@ -316,7 +319,7 @@ export default function MyApplications() {
                     <button
                       key={i}
                       onClick={() => setCurrentPage(i + 1)}
-                      className={`w-10 h-10 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                      className={`w-10 h-10 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${
                         currentPage === i + 1
                           ? "bg-white/10 text-white shadow-inner"
                           : "bg-slate-800/40 text-slate-400 hover:bg-slate-700/50 hover:text-white"
@@ -331,7 +334,7 @@ export default function MyApplications() {
                       setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                     }
                     disabled={currentPage === totalPages}
-                    className="px-4 py-2 rounded-xl border border-white/10 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                    className="px-4 py-2 rounded-xl border border-white/10 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                   >
                     <ChevronRight size={16} />
                   </button>
@@ -342,5 +345,20 @@ export default function MyApplications() {
         </div>
       </div>
     </div>
+  );
+}
+
+// FIXED: Main export wrapped in Suspense to prevent Next.js build errors
+export default function MyApplications() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-slate-950 text-slate-300">
+          <p className="text-sm">Loading application dynamic parameters...</p>
+        </div>
+      }
+    >
+      <MyApplicationsContent />
+    </Suspense>
   );
 }
