@@ -79,7 +79,7 @@ export default function OpportunityDetailsPage() {
           {/* Back button & Actions */}
           <div className="flex items-center justify-between mb-8">
             <Link
-              href="/dashboard/collaborator/my-applications"
+              href="/browse-opportunities"
               className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition-colors group"
             >
               <ArrowLeft

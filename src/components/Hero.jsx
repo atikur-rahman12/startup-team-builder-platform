@@ -1,5 +1,6 @@
 import React from "react";
 import { ArrowUpRight, Zap, Play, Shield, Users, Trophy } from "lucide-react";
+import Link from "next/link";
 
 const Hero = () => {
   return (
@@ -43,13 +44,16 @@ const Hero = () => {
 
           {/* ৬. CTA Premium Button Group */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-2xl text-sm font-semibold text-white bg-linear-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 shadow-xl shadow-indigo-500/20 active:scale-[0.98] transition-all duration-300 group cursor-pointer">
-              <span>Launch Your Startup</span>
+            <Link
+              href={"/browse-opportunities"}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-2xl text-sm font-semibold text-white bg-linear-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 shadow-xl shadow-indigo-500/20 active:scale-[0.98] transition-all duration-300 group cursor-pointer"
+            >
+              <span>Opportunities</span>
               <ArrowUpRight
                 size={18}
                 className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 text-slate-200"
               />
-            </button>
+            </Link>
 
             <button className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl text-sm font-semibold text-slate-300 bg-white/5 border border-white/5 hover:border-white/10 hover:text-white backdrop-blur-md active:scale-[0.98] transition-all duration-300 group cursor-pointer">
               <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-white group-hover:bg-indigo-500 transition-colors duration-300">
