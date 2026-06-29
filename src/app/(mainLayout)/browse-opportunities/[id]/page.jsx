@@ -26,7 +26,7 @@ export default function OpportunityDetailsPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data: session, isPending } = useSession();
+  const { data: session } = useSession();
 
   const currentUser = session?.user
     ? {
@@ -37,7 +37,6 @@ export default function OpportunityDetailsPage() {
     : null;
 
   const [opportunity, setOpportunity] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   const [isSaved, setIsSaved] = useState(false);
   const [isApplied, setIsApplied] = useState(false);
@@ -46,7 +45,7 @@ export default function OpportunityDetailsPage() {
   const formatDeadline = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
-    if (isNaN(date.getTime())) return dateString; // যদি অলরেডি স্ট্রিং বা ইনভ্যালিড হয়, তবে যা আছে তাই দেখাবে
+    if (isNaN(date.getTime())) return dateString; // যদি অলরেডি স্ট্রিং বা ইনভ্যালিড হয়, তবে যা আছে তাই দেখাবে
     return date.toLocaleDateString("en-US", {
       month: "long",
       day: "numeric",
@@ -61,8 +60,6 @@ export default function OpportunityDetailsPage() {
         setOpportunity(data);
       } catch (error) {
         console.error(error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -70,20 +67,6 @@ export default function OpportunityDetailsPage() {
       fetchOpportunity();
     }
   }, [params.id]);
-
-  if (loading || !opportunity) {
-    return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-          <span className="loading loading-spinner loading-xl"></span>
-          <p className="text-sm font-medium text-slate-400">
-            Loading opportunity details...
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -128,13 +111,15 @@ export default function OpportunityDetailsPage() {
               <div className="p-6 sm:p-8 rounded-3xl border border-white/10 bg-slate-900/40 backdrop-blur-xl shadow-xl">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
                   <div className="relative size-16 sm:size-20 rounded-2xl border border-white/10 bg-slate-950 overflow-hidden shrink-0 shadow-inner">
-                    <Image
-                      src={opportunity?.startupLogo}
-                      alt={opportunity?.startupName}
-                      fill
-                      className="object-cover p-2"
-                      unoptimized
-                    />
+                    {opportunity?.startupLogo && (
+                      <Image
+                        src={opportunity?.startupLogo}
+                        alt={opportunity?.startupName || "Startup Logo"}
+                        fill
+                        className="object-cover p-2"
+                        unoptimized
+                      />
+                    )}
                   </div>
 
                   {/* Title and Startup Info */}
@@ -195,7 +180,9 @@ export default function OpportunityDetailsPage() {
                         Posted On
                       </span>
                       <span className="text-sm font-semibold text-slate-200">
-                        {new Date(opportunity?.createdAt).toLocaleDateString()}
+                        {opportunity?.createdAt
+                          ? new Date(opportunity.createdAt).toLocaleDateString()
+                          : ""}
                       </span>
                     </div>
                   </div>
@@ -315,9 +302,9 @@ export default function OpportunityDetailsPage() {
       <ApplyModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        roleTitle={opportunity.roleTitle}
-        startupName={opportunity.startupName}
-        opportunityId={opportunity._id?.toString()}
+        roleTitle={opportunity?.roleTitle}
+        startupName={opportunity?.startupName}
+        opportunityId={opportunity?._id?.toString()}
         user={currentUser}
       />
     </>

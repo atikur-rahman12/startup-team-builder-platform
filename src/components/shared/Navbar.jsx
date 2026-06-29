@@ -69,7 +69,8 @@ const Navbar = () => {
             setIsOpen(false);
             setIsUserDropdownOpen(false);
             console.log("User successfully logged out.");
-            router.push("/");
+            // লগআউট সফল হলে সরাসরি আনঅথরাইজড পেজে রিডাইরেক্ট করবে
+            router.push("/unauthorized");
           },
         },
       });
