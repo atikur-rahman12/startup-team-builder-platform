@@ -29,13 +29,11 @@ export default function UnauthorizedPage() {
             admin if you think this is a mistake.
           </p>
 
-          {/* Lock Info */}
           <div className="mt-6 flex items-center justify-center gap-2 text-slate-500 text-xs">
             <Lock className="w-4 h-4" />
             Secure Access Protected
           </div>
 
-          {/* Buttons */}
           <div className="mt-8 flex flex-col gap-3">
             <Link
               href="/signin"
